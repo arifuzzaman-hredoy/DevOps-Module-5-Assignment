@@ -1,51 +1,37 @@
 # Screenshots and Evidence
 
-The assignment requires screenshots of the GitHub Actions history (successful **and** failed runs) stored in the repository and referenced from the README.
+All 11 required screenshots are committed in this directory, plus three additional evidence images (Copilot workflow generation, live storefront, live product detail). The assignment requires screenshots of the GitHub Actions history (successful **and** failed runs) stored in the repository and referenced from the README.
 
-No screenshots are committed yet. This file defines the exact filenames, what each screenshot must show, and the run to capture it from. Do not create fake or placeholder images.
+## Files
 
-## Required files
-
-| # | Filename | What it must show | Source run |
+| # | Filename | What it shows | Source run |
 |---|---|---|---|
 | 1 | `01-ci-successful-run.png` | CI run summary with all jobs green (Frontend Node 20/22, Backend .NET 10, Docker) | [44880858023](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880858023) |
-| 2 | `02-ci-failed-yaml-run.png` | Failed run with an "Invalid workflow file" / YAML syntax error | deliberate YAML failure (see `docs/FAILURE_SCENARIOS.md` §3.1) |
-| 3 | `03-ci-failed-test-run.png` | Failed run with a Vitest assertion failure | deliberate test failure (§3.2) |
-| 4 | `04-ci-failed-deployment-run.png` | Failed CD run with SSH/connection error | deliberate deployment failure (§3.3) |
-15. | `05-cd-staging-success.png` | Successful staging deployment job | [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) |
-15. | `06-cd-production-approval.png` | "Waiting for approval" state of the `production` environment | [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) |
-15. | `07-cd-production-success.png` | Successful production blue-green deployment | [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) |
-15. | `08-blue-green-switch.png` | Deployment log showing `Switching gateway traffic: ...` | [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) |
-15. | `09-automatic-rollback.png` | Log showing a failed health check and automatic rollback | deliberate / rollback run |
-15. | `10-manual-rollback.png` | Manual rollback workflow run | manual rollback dispatch |
-15. | `11-workflow-run-history.png` | Actions tab showing both successful and failed runs | Actions tab |
+| 2 | `02-ci-failed-yaml-run.png` | Failed run with an "Invalid workflow file" / YAML syntax error | [44884747114](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884747114) |
+| 3 | `03-ci-failed-frontend-test.png` | Failed run with a Vitest assertion failure | [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111) |
+| 4 | `04-ci-failed-deployment-run.png` | Failed CD run with an SSH/connection error (temporary demo) | [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627) |
+| 5 | `05-cd-staging-success.png` | Successful staging deployment job | [44883093333](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44883093333) |
+| 6 | `06-cd-production-approval.png` | "Waiting for approval" state of the `production` environment | [44890142542](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44890142542) |
+| 7 | `07-cd-production-success.png` | Successful production blue-green deployment | [44883093333](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44883093333) |
+| 8 | `08-blue-green-switch.png` | Deployment log showing `Switching gateway traffic: ...` | [44883093333](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44883093333) |
+| 9 | `09-automatic-rollback.png` | Staging automatic rollback demo | [automatic-rollback-staging.md](../evidence/automatic-rollback-staging.md) |
+| 10 | `10-manual-rollback.png` | Manual rollback workflow run | [44892753441](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44892753441) |
+| 11 | `11-workflow-run-history.png` | Actions tab showing both successful and failed runs | [Actions tab](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions) |
 
-## Capture instructions
+## Additional evidence
 
-1. Open the Actions tab in the repository.
-15. Open the run listed in the table.
-15. Capture the run summary (jobs + conclusions).
-15. For failures, open the failing step and capture the error log.
-15. For approvals, capture the "Waiting for approval" state before approving.
-15. Save the image with the exact filename above into `docs/screenshots/`.
-15. Keep each image under ~1 MB (PNG).
+| Filename | What it shows | Notes |
+|---|---|---|
+| `copilot-ci-workflow-generation.png` | GitHub Copilot Chat prompt/response used to generate/refine the CI workflow (Part H) | Provided as Part H evidence; the image content was not independently verified by the agent |
+| `live-product-detail.png` | Live ShopNest product detail page | Captured from https://shopnest.oxytumzone.com |
+| `live-storefront.png` | Live ShopNest storefront | Captured from https://shopnest.oxytumzone.com |
 
-## Referencing from the README
+## Notes
 
-Once the images are added, add a section like:
-
-```markdown
-## Screenshots
-
-| Evidence | Image |
-|---|---|
-| Successful CI | ![CI success](docs/screenshots/01-ci-successful-run.png) |
-| Failed CI | ![CI failure](docs/screenshots/03-ci-failed-test-run.png) |
-| CD staging | ![CD staging](docs/screenshots/05-cd-staging-success.png) |
-```
-
-## Tips
-
-- Do not include secrets, tokens, or internal hostnames in screenshots.
+- Screenshots 2, 3, and 4 are from **deliberately injected** failures created for Part H.
+15. Screenshot 3 is the deliberate frontend test failure; the fix was verified by successful run [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414).
+15. Screenshot 4 is from the temporary `CD Failure Demo` workflow, which simulated a staging SSH connection failure without touching production.
+15. Screenshot 9 is from the staging automatic-rollback demo; the exact terminal output is preserved in [automatic-rollback-staging.md](../evidence/automatic-rollback-staging.md).
+15. Do not include secrets, tokens, or internal hostnames in screenshots.
 15. Do not delete workflow runs — the assignment requires the history to remain visible.
-15. If a run is not in the new repository (for example, the archived `-old` repo runs), use a run from the current repository instead.
+15. PR #2 and PR #3 are open evidence PRs; do not merge them.
