@@ -1,0 +1,10 @@
+# syntax=docker/dockerfile:1
+
+FROM nginx:1.27-alpine AS runtime
+RUN apk add --no-cache gettext
+
+ENV BACKEND_HOST=backend
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY dist/ /usr/share/nginx/html
+
+EXPOSE 80

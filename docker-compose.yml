@@ -1,0 +1,147 @@
+name: shopnest
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: shopnest-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-shopnest}
+      POSTGRES_USER: ${POSTGRES_USER:-shopnest}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set (copy .env.example to .env)}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shopnest} -d ${POSTGRES_DB:-shopnest}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    # Intentionally not published: PostgreSQL is only reachable on the private 'app' network.
+
+  blue-backend:
+    image: ${BACKEND_IMAGE:-shopnest-backend:local}
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: shopnest-blue-backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB:-shopnest};Username=${POSTGRES_USER:-shopnest};Password=${POSTGRES_PASSWORD}"
+      Migrations__Path: /app/migrations
+      APP_VERSION: ${APP_VERSION:-local}
+      APP_COMMIT: ${APP_COMMIT:-unknown}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8080"
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health/ready || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  green-backend:
+    image: ${BACKEND_IMAGE:-shopnest-backend:local}
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: shopnest-green-backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB:-shopnest};Username=${POSTGRES_USER:-shopnest};Password=${POSTGRES_PASSWORD}"
+      Migrations__Path: /app/migrations
+      APP_VERSION: ${APP_VERSION:-local}
+      APP_COMMIT: ${APP_COMMIT:-unknown}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8080"
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health/ready || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  blue-frontend:
+    image: ${FRONTEND_IMAGE:-shopnest-frontend:local}
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shopnest-blue-frontend
+    restart: unless-stopped
+    environment:
+      BACKEND_HOST: blue-backend
+    depends_on:
+      blue-backend:
+        condition: service_healthy
+    expose:
+      - "80"
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  green-frontend:
+    image: ${FRONTEND_IMAGE:-shopnest-frontend:local}
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shopnest-green-frontend
+    restart: unless-stopped
+    environment:
+      BACKEND_HOST: green-backend
+    depends_on:
+      green-backend:
+        condition: service_healthy
+    expose:
+      - "80"
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: shopnest-gateway
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-80}:80"
+    volumes:
+      - ./nginx/gateway/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      blue-frontend:
+        condition: service_healthy
+      green-frontend:
+        condition: service_healthy
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  pgdata:

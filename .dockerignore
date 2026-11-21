@@ -1,0 +1,13 @@
+.git
+.github
+.kilo
+**/node_modules
+**/dist
+**/bin
+**/obj
+**/.vs
+**/*.user
+**/*.suo
+docs
+LICENSE
+*.md

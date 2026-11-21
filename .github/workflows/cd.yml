@@ -1,0 +1,187 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+      action:
+        description: Deploy a new release or roll back
+        type: choice
+        options: [deploy, rollback]
+        default: deploy
+      image_tag:
+        description: "Image tag (e.g. sha-1a2b3c4). Required for rollback."
+        required: false
+        type: string
+      colour:
+        description: Target colour for rollback
+        type: choice
+        options: [auto, blue, green]
+        default: auto
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  REGISTRY: ghcr.io
+
+concurrency:
+  group: cd-${{ github.event.workflow_run.head_branch || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Resolve release
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      short_sha: ${{ steps.meta.outputs.short_sha }}
+      reason: ${{ steps.meta.outputs.reason }}
+    steps:
+      - name: Resolve commit and image tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            if [ "${{ github.event.workflow_run.conclusion }}" != "success" ]; then
+              echo "CI conclusion was '${{ github.event.workflow_run.conclusion }}'; skipping deployment."
+              echo "reason=ci-failed" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sha="${{ github.event.workflow_run.head_sha }}"
+            echo "reason=ci" >> "$GITHUB_OUTPUT"
+          else
+            sha="${{ github.sha }}"
+            echo "reason=manual" >> "$GITHUB_OUTPUT"
+          fi
+          short="${sha:0:7}"
+          echo "short_sha=$short" >> "$GITHUB_OUTPUT"
+          echo "image_tag=sha-$short" >> "$GITHUB_OUTPUT"
+          echo "Resolved image tag: sha-$short (commit $sha)"
+
+  deploy-staging:
+    name: Deploy to staging
+    needs: prepare
+    if: >-
+      needs.prepare.outputs.reason != 'ci-failed' && (
+        github.event_name == 'workflow_run' ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && github.event.inputs.environment == 'staging')
+      )
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    steps:
+      - name: Deploy and verify staging
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
+          REGISTRY: ${{ env.REGISTRY }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_DIR: ${{ vars.APP_DIR }}
+          TARGET_URL: ${{ vars.STAGING_URL }}
+          COMMIT_SHA: ${{ needs.prepare.outputs.short_sha }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ vars.EC2_PORT || 22 }}
+          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COMMIT_SHA
+          script: |
+            set -euo pipefail
+            cd "$APP_DIR"
+            echo "Deploying commit $COMMIT_SHA ($IMAGE_TAG) to STAGING"
+            echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
+            export PULL_IMAGES=true
+            export APP_COMMIT="$COMMIT_SHA"
+            export APP_VERSION="$IMAGE_TAG"
+            ./scripts/bg-deploy.sh "$IMAGE_TAG"
+            ./scripts/smoke-test.sh "$TARGET_URL"
+
+  deploy-production:
+    name: Deploy to production (blue-green)
+    needs: [prepare]
+    if: >-
+      needs.prepare.outputs.reason != 'ci-failed' && (
+        github.event_name == 'workflow_run' ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' && github.event.inputs.environment == 'production')
+      )
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+    steps:
+      - name: Deploy to production and verify
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
+          REGISTRY: ${{ env.REGISTRY }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_DIR: ${{ vars.APP_DIR }}
+          TARGET_URL: ${{ vars.PRODUCTION_URL }}
+          COMMIT_SHA: ${{ needs.prepare.outputs.short_sha }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ vars.EC2_PORT || 22 }}
+          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COMMIT_SHA
+          script: |
+            set -euo pipefail
+            cd "$APP_DIR"
+            echo "Blue-Green deploy of $IMAGE_TAG (commit $COMMIT_SHA) to PRODUCTION"
+            echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
+            export PULL_IMAGES=true
+            export APP_COMMIT="$COMMIT_SHA"
+            export APP_VERSION="$IMAGE_TAG"
+            ./scripts/bg-deploy.sh "$IMAGE_TAG"
+            ./scripts/smoke-test.sh "$TARGET_URL"
+
+  manual-rollback:
+    name: Manual rollback
+    needs: prepare
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.action == 'rollback' &&
+      github.event.inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Roll back production
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+          REGISTRY: ${{ env.REGISTRY }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_DIR: ${{ vars.APP_DIR }}
+          TARGET_URL: ${{ vars.PRODUCTION_URL }}
+          COLOUR: ${{ github.event.inputs.colour }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ vars.EC2_PORT || 22 }}
+          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COLOUR
+          script: |
+            set -euo pipefail
+            cd "$APP_DIR"
+            echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
+            export PULL_IMAGES=true
+            if [ "$COLOUR" = "auto" ]; then
+              ./scripts/rollback.sh "$IMAGE_TAG"
+            else
+              ./scripts/rollback.sh "$IMAGE_TAG" "$COLOUR"
+            fi
+            ./scripts/smoke-test.sh "$TARGET_URL"
