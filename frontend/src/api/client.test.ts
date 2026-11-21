@@ -38,7 +38,7 @@ describe('api client', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
-    expect(url).toBe('/api/products-wrong')
+    expect(url).toBe('/api/products')
     expect(init.headers).toEqual({ Accept: 'application/json' })
     expect(products).toEqual([sampleProduct])
   })
