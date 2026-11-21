@@ -412,7 +412,7 @@ Actual result:
 
 The original workflow files were generated with **Kilo**, an AI coding assistant, and then reviewed and corrected. The exact prompts, the generated output, and the manual changes are documented in [docs/COPILOT.md](docs/COPILOT.md).
 
-The prompts in `docs/COPILOT.md` are **reproducible prompts** that can be pasted into **GitHub Copilot Chat**. The original workflows were generated with **Kilo** (an AI coding assistant), not GitHub Copilot; the prompts and the manual changes are documented for reproducibility. Part H is complete based on this AI-assisted workflow generation and the documented failure/fix evidence.
+A genuine user-captured GitHub Copilot Chat prompt/response is included at [docs/screenshots/copilot-ci-workflow-generation.png](docs/screenshots/copilot-ci-workflow-generation.png). It records a separate Copilot workflow-generation/refinement interaction. The original workflow implementation remains accurately attributed to **Kilo**; the Copilot screenshot is evidence of the separate Copilot Chat interaction, not a claim that Kilo-generated files were authored by Copilot. Part H includes this Copilot evidence together with the documented AI-assisted implementation and failure/fix evidence.
 
 ---
 
@@ -448,7 +448,7 @@ Detailed logs: [docs/evidence/](docs/evidence/).
 
 ## 13. Screenshots and Actions History
 
-All 11 required screenshots are committed in [`docs/screenshots/`](docs/screenshots/).
+All 11 required screenshots plus 3 additional evidence images (**14 total**) are committed in [`docs/screenshots/`](docs/screenshots/). The additional images include the GitHub Copilot Chat interaction, live storefront, and live product detail.
 
 | # | Screenshot | Evidence |
 |---|---|---|
@@ -479,8 +479,8 @@ All 11 required screenshots are committed in [`docs/screenshots/`](docs/screensh
 | E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `https://shopnest.oxytumzone.com` via SSH from GitHub Actions |
 | F | Zero-downtime deployment | ✅ Complete — blue-green verified on EC2 (staging 34s, production 26s) |
 | G | Monitoring, health checks, rollback | ✅ Complete — health checks, automatic rollback and manual rollback verified |
-| H | Debugging & Copilot-assisted development | ✅ Complete — real failures documented; deliberate YAML/test/deployment failures documented with runs and fixes; 11+ screenshots committed; AI-assisted (Kilo) workflow generation prompts and changes documented |
-| I | Documentation & repository quality | ✅ Complete — README, docs, 11 screenshots, structure, commits, PR template; PR #1 merged and PR #2/#3 open as evidence |
+| H | Debugging & Copilot-assisted development | ✅ Complete — real failures documented; deliberate YAML/test/deployment failures documented with runs and fixes; 14 screenshots committed, including GitHub Copilot Chat interaction evidence; Kilo workflow-generation attribution and AI-assisted changes documented |
+| I | Documentation & repository quality | ✅ Complete — README, docs, 14 screenshots, structure, commits, PR template; PR #1 merged and PR #2/#3 open as evidence |
 
 ### Remaining manual tasks
 
