@@ -113,6 +113,49 @@ shopnest-blue-frontend  Up (healthy)
 shopnest-green-frontend Up (healthy)
 ```
 
+---
+
+### Failure 4: CI failed with `Copy-Item: command not found`
+
+**Workflow run:** [44860561407](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860561407) (commit `008b0d6`)
+
+**Failing step:** `Bundle migrations into publish output`
+
+```text
+/home/runner/work/_temp/445f51f8-...sh: line 1: Copy-Item: command not found
+##[error]Process completed with exit code 127.
+```
+
+**Root cause:** GitHub-hosted runners use **Bash** as the default shell for `run` steps. `Copy-Item` is a **PowerShell** cmdlet and does not exist in Bash. The step was intended to copy `database/migrations` into the publish output.
+
+**Fix:** replaced it with a POSIX `cp`:
+
+```yaml
+- name: Bundle migrations into publish output
+  run: cp -r ../database/migrations publish/migrations
+```
+
+**Fix commit:** `cbee38b` — `fix(ci): use cp instead of PowerShell Copy-Item in migration bundle step`.
+
+**Verification:** run [44860712719](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860712719) passed — all jobs green and both images pushed to GHCR.
+
+---
+
+### Failure 5 (expected, configuration gap): CD fails without EC2 secrets
+
+**Workflow run:** [44860883080](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860883080)
+
+```text
+Error: missing server host
+##[error]Process completed with exit code 1
+```
+
+**Root cause:** `EC2_HOST`, `EC2_USER`, and `EC2_SSH_KEY` are not configured in this environment, and no EC2 instance is available.
+
+**Resolution:** configure the secrets/variables described in [DEPLOYMENT.md](DEPLOYMENT.md). This is a configuration gap, not a workflow bug — the workflow correctly refuses to deploy without a target.
+
+---
+
 ## Part 2 — Deliberate failure scenarios
 
 All scenarios are implemented in `scripts/failure-scenarios.sh` and are safe:

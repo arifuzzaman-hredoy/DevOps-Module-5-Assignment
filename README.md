@@ -376,6 +376,7 @@ These are actual errors encountered while building and validating the project, n
 | 1 | Backend build: `IServiceCollection does not contain AddOpenApi`, `StatusCodes.StatusServiceUnavailable does not exist` | OpenAPI helper is not available in this project configuration; wrong status-code constant name | Removed the unused OpenAPI registration; changed to `StatusCodes.Status503ServiceUnavailable` |
 | 2 | Test build: `CS0747 Invalid initializer member declarator` | Ambiguous object-initializer shorthand (`CreatedAt`) | Rewrote the test with an explicit `CreatedAt = SampleCreatedAt` |
 | 3 | Frontend container reported `unhealthy`; `wget: can't connect to remote host` on `localhost` | `localhost` resolved to IPv6 `::1` inside the container, while Nginx listens on IPv4 | Changed health checks and internal probes to `127.0.0.1` |
+| 4 | CI failed with `Copy-Item: command not found` | GitHub-hosted runners use Bash; `Copy-Item` is a PowerShell cmdlet | Replaced it with `cp -r ../database/migrations publish/migrations` (commit `cbee38b`) |
 
 Each of these was reproduced locally, diagnosed from the build/container logs, fixed, and re-verified. See [docs/FAILURE_SCENARIOS.md](docs/FAILURE_SCENARIOS.md) and [docs/COPILOT.md](docs/COPILOT.md).
 
@@ -424,6 +425,11 @@ All commands below were actually executed locally (Docker Desktop 29.9, .NET 10 
 | Auto rollback | `SIMULATE_FAILURE=post` | ✅ Rolled back, smoke passed |
 | Manual rollback | `./scripts/rollback.sh` | ✅ Switched, smoke passed |
 | Bad image safety | non-existent tag | ✅ Active colour unchanged |
+| **GitHub Actions CI** | push to `main` (run `cbee38b`) | ✅ **All jobs green** — Frontend Node 20/22, Backend (.NET 10), images published to GHCR |
+
+CI run: [44860712719](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860712719). The earlier failed run ([44860561407](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860561407)) is the `Copy-Item` failure documented above; it was fixed in `cbee38b`.
+
+CD run: [44860883080](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860883080) correctly fails with `missing server host` until the EC2 secrets are configured. A CD run triggered by the failed CI ([44860640934](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860640934)) correctly skipped all deployment jobs.
 
 Detailed logs: [docs/evidence/](docs/evidence/).
 
@@ -437,7 +443,14 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 - Screenshots must be captured from the **Actions** tab and placed in `docs/screenshots/`.
 - A checklist and naming convention are provided in [docs/screenshots/README.md](docs/screenshots/README.md).
 
-> No screenshots are included yet because no GitHub Actions run exists until the code is pushed and the workflows execute. This is called out explicitly rather than fabricated.
+> Screenshots must be captured from the **Actions** tab and placed in `docs/screenshots/`. Actual runs to capture:
+>
+> - CI success: [44860712719](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860712719)
+> - CI failure (fixed): [44860561407](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860561407)
+> - CD skipped after failed CI: [44860640934](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860640934)
+> - CD blocked by missing EC2 secrets (expected): [44860883080](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860883080)
+>
+> No image files are committed yet because capturing the browser screenshots is a manual step. This is called out explicitly rather than fabricated.
 
 ---
 
@@ -446,13 +459,13 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 | Part | Topic | Status |
 |---|---|---|
 | A | CI/CD concepts | ✅ Complete |
-| B | Continuous Integration pipeline | ✅ Implemented; runs on push/PR after push |
-| C | Workflow architecture | ✅ Separate workflows, dependencies, parallel matrix, artifacts, diagram |
+| B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44860712719` |
+| C | Workflow architecture | ✅ Verified: Node 20/22 matrix, backend job, `docker` dependency, artifacts, GHCR |
 | D | Secrets & configuration | ✅ No secrets committed; env separation; production approval; full listing |
-| E | Automated deployment to EC2 | ⚠️ Configuration complete; **AWS deployment not executed** (no credentials) |
+| E | Automated deployment to EC2 | ⚠️ CD workflow runs and fails only because EC2 secrets are absent (expected); actual AWS deployment pending |
 | F | Zero-downtime deployment | ✅ Implemented and locally verified (68 requests, 0 failures); EC2 evidence pending |
 | G | Monitoring, health checks, rollback | ✅ Implemented and locally verified; EC2 evidence pending |
-| H | Debugging & Copilot-assisted development | ✅ Real failures documented; Copilot prompts documented; GitHub run screenshots pending |
+| H | Debugging & Copilot-assisted development | ✅ Real failures documented (CI run `44860561407` fixed in `cbee38b`); Copilot prompts documented; screenshots pending |
 | I | Documentation & repository quality | ✅ This README, docs, folder structure, commit history |
 
 ### Remaining manual tasks
