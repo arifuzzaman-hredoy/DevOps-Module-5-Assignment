@@ -2,7 +2,9 @@
 
 A production-oriented three-tier e-commerce application built to demonstrate **automated CI/CD, containerization, zero-downtime deployment, and rollback** with GitHub Actions, Docker, and AWS EC2.
 
-> **Live URL:** Not deployed yet. The AWS EC2 deployment is fully configured but requires AWS credentials and an EC2 host (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). This repository contains the complete, locally verified implementation.
+> **Live URL:** **Production:** http://3.106.255.197  |  **Staging:** http://3.106.255.197:8080
+>
+> Deployed on AWS EC2 (Ubuntu 24.04, Docker) through the CD pipeline in this repository. Production is a blue-green deployment with a manual approval gate; staging is deployed automatically after each successful CI run.
 
 ---
 
@@ -427,9 +429,8 @@ All commands below were actually executed locally (Docker Desktop 29.9, .NET 10 
 | Bad image safety | non-existent tag | ✅ Active colour unchanged |
 | **GitHub Actions CI** | push to `main` (run `cbee38b`) | ✅ **All jobs green** — Frontend Node 20/22, Backend (.NET 10), images published to GHCR |
 
-CI run: [44860712719](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860712719). The earlier failed run ([44860561407](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860561407)) is the `Copy-Item` failure documented above; it was fixed in `cbee38b`.
-
-CD run: [44860883080](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860883080) correctly fails with `missing server host` until the EC2 secrets are configured. A CD run triggered by the failed CI ([44860640934](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860640934)) correctly skipped all deployment jobs.
+CI run: [44871593115](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871593115) — all jobs green; images in GHCR.
+CD run: [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500) — staging (34s) and production (26s) deployed successfully with blue-green, after manual approval of the `production` environment.
 
 Detailed logs: [docs/evidence/](docs/evidence/).
 
@@ -445,10 +446,10 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 
 > Screenshots must be captured from the **Actions** tab and placed in `docs/screenshots/`. Actual runs to capture:
 >
-> - CI success: [44860712719](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860712719)
-> - CI failure (fixed): [44860561407](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860561407)
-> - CD skipped after failed CI: [44860640934](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860640934)
-> - CD blocked by missing EC2 secrets (expected): [44860883080](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44860883080)
+> - CI success: [44871593115](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871593115)
+> - CD staging deploy: [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500)
+> - Production approval gate: [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500)
+> - Blue-green switch (green → blue): [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500)
 >
 > No image files are committed yet because capturing the browser screenshots is a manual step. This is called out explicitly rather than fabricated.
 
@@ -459,25 +460,22 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 | Part | Topic | Status |
 |---|---|---|
 | A | CI/CD concepts | ✅ Complete |
-| B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44860712719` |
+| B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44871593115` |
 | C | Workflow architecture | ✅ Verified: Node 20/22 matrix, backend job, `docker` dependency, artifacts, GHCR |
-| D | Secrets & configuration | ✅ No secrets committed; env separation; production approval; full listing |
-| E | Automated deployment to EC2 | ⚠️ CD workflow runs and fails only because EC2 secrets are absent (expected); actual AWS deployment pending |
-| F | Zero-downtime deployment | ✅ Implemented and locally verified (68 requests, 0 failures); EC2 evidence pending |
-| G | Monitoring, health checks, rollback | ✅ Implemented and locally verified; EC2 evidence pending |
-| H | Debugging & Copilot-assisted development | ✅ Real failures documented (CI run `44860561407` fixed in `cbee38b`); Copilot prompts documented; screenshots pending |
-| I | Documentation & repository quality | ✅ This README, docs, folder structure, commit history |
+| D | Secrets & configuration | ✅ No real secrets committed; staging/production environments, production reviewer and branch protection configured |
+| E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `http://3.106.255.197` via SSH from GitHub Actions |
+| F | Zero-downtime deployment | ✅ Complete — blue-green verified on EC2 (staging 34s, production 26s) |
+| G | Monitoring, health checks, rollback | ✅ Complete — health checks, automatic rollback and manual rollback verified |
+| H | Debugging & Copilot-assisted development | ⚠️ Partial — real failures documented, Copilot prompts documented; Actions screenshots and 3 deliberate failure runs still to capture |
+| I | Documentation & repository quality | ✅ Mostly complete — README, docs, structure, commits, PR template; screenshots pending |
 
 ### Remaining manual tasks
 
-1. **AWS EC2**: provision the instance, install Docker, clone the repo to `APP_DIR`, create `.env` with a strong `POSTGRES_PASSWORD`.
-2. **GitHub configuration**:
-   - Create `staging` and `production` environments; add `EC2_HOST`, `EC2_USER`, `EC2_SSH_KEY` to each.
-   - Add repository variables `APP_DIR`, `STAGING_URL`, `PRODUCTION_URL` (and optional `EC2_PORT`).
-   - Add required reviewers to the `production` environment.
-   - Enable branch protection on `main` with the CI checks.
-3. **Run and capture**: push to `main`, let CI/CD run, capture Actions screenshots into `docs/screenshots/`.
-4. **Security group**: allow 80/443, restrict 22; do **not** expose 5432.
+1. **Screenshots**: capture the Actions runs into `docs/screenshots/` (see `docs/screenshots/README.md`).
+2. **Part H deliberate failures**: create and capture 3 different pipeline failures (YAML, test, deployment) on branches.
+3. **PR-based workflow**: open and merge a PR so the repository shows a real pull-request history.
+4. **Old repo cleanup**: delete `DevOps-Module-5-Assignment-old` (the previous repo, renamed because the token lacked `delete_repo`).
+5. **Keep the server running**: keep EC2 instance `i-0caf589083c6b43cb` running until grading finishes.
 
 ---
 
