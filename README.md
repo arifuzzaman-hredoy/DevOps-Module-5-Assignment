@@ -39,11 +39,6 @@ Open `http://localhost:8080` for the storefront and `http://localhost:8080/api/i
 | Staging | http://shopnest.oxytumzone.com:8080 |
 | Build metadata | https://shopnest.oxytumzone.com/api/info |
 
-| Evidence | Screenshot |
-|---|---|
-| Storefront | _Add `docs/screenshots/live-storefront.png`_ |
-| Product details | _Add `docs/screenshots/live-product-detail.png`_ |
-
 ---
 
 ## 2. Technology Stack
@@ -288,7 +283,7 @@ The database is **not** exposed: `db` has no `ports:` entry in `docker-compose.y
 
 Full step-by-step instructions, including security groups and secrets, are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-> **Not executed here:** this environment has no AWS credentials or EC2 instance. The configuration is complete and validated locally with Docker Compose; the actual cloud deployment must be run with your AWS account.
+> **Executed:** the pipeline deployed to AWS EC2. Production is live at `https://shopnest.oxytumzone.com` and staging at `http://shopnest.oxytumzone.com:8080`; the production release is a blue-green deployment with a manual approval gate. See CD run [44872809287](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44872809287) and the live `/api/info` endpoint for the deployed commit.
 
 ---
 
@@ -380,7 +375,7 @@ Or trigger the **`CD` workflow** with `action = rollback`, `environment = produc
 
 ---
 
-## 11. Part H — Debugging, Failure Testing and Copilot
+## 11. Part H — Debugging, Failure Testing and AI-Assisted Development
 
 ### Real failures found and fixed during this implementation
 
@@ -413,9 +408,11 @@ Actual result:
 [ OK ] Failure scenario 'inactive-down' completed
 ```
 
-### GitHub Copilot
+### AI assistance (Kilo) and GitHub Copilot
 
-The workflow files were generated with AI assistance and then reviewed and corrected. The exact prompts, the generated output, and the manual changes are documented in [docs/COPILOT.md](docs/COPILOT.md).
+The original workflow files were generated with **Kilo**, an AI coding assistant, and then reviewed and corrected. The exact prompts, the generated output, and the manual changes are documented in [docs/COPILOT.md](docs/COPILOT.md).
+
+The prompts in `docs/COPILOT.md` are **reproducible prompts** that can be pasted into **GitHub Copilot Chat**; they are **not** proof that GitHub Copilot was used. Literal GitHub Copilot IDE evidence is not included, which is why Part H remains **Partial**.
 
 ---
 
@@ -451,20 +448,23 @@ Detailed logs: [docs/evidence/](docs/evidence/).
 
 ## 13. Screenshots and Actions History
 
-The assignment requires screenshots of successful and failed GitHub Actions runs in the repository.
+All 11 required screenshots are committed in [`docs/screenshots/`](docs/screenshots/).
 
-- The workflows are committed and will run on the first push to `main`.
-- Screenshots must be captured from the **Actions** tab and placed in `docs/screenshots/`.
-- A checklist and naming convention are provided in [docs/screenshots/README.md](docs/screenshots/README.md).
+| # | Screenshot | Evidence |
+|---|---|---|
+| 1 | [01-ci-successful-run.png](docs/screenshots/01-ci-successful-run.png) | CI run [44880858023](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880858023) |
+| 2 | [02-ci-failed-yaml-run.png](docs/screenshots/02-ci-failed-yaml-run.png) | Deliberate YAML failure, run [44884747114](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884747114) |
+| 3 | [03-ci-failed-frontend-test.png](docs/screenshots/03-ci-failed-frontend-test.png) | Deliberate frontend test failure, run [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111) |
+| 4 | [04-ci-failed-deployment-run.png](docs/screenshots/04-ci-failed-deployment-run.png) | Deliberate staging SSH failure demo, run [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627) |
+| 5 | [05-cd-staging-success.png](docs/screenshots/05-cd-staging-success.png) | CD run [44883093333](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44883093333) |
+| 6 | [06-cd-production-approval.png](docs/screenshots/06-cd-production-approval.png) | Production approval gate, run [44890142542](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44890142542) |
+| 7 | [07-cd-production-success.png](docs/screenshots/07-cd-production-success.png) | CD run [44883093333](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44883093333) |
+| 8 | [08-blue-green-switch.png](docs/screenshots/08-blue-green-switch.png) | CD run [44883093333](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44883093333) |
+| 9 | [09-automatic-rollback.png](docs/screenshots/09-automatic-rollback.png) | Staging automatic-rollback demo; exact output in [docs/evidence/automatic-rollback-staging.md](docs/evidence/automatic-rollback-staging.md) |
+| 10 | [10-manual-rollback.png](docs/screenshots/10-manual-rollback.png) | Manual rollback run [44892753441](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44892753441) |
+| 11 | [11-workflow-run-history.png](docs/screenshots/11-workflow-run-history.png) | [Actions tab](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions) showing successful and failed runs |
 
-> Screenshots must be captured from the **Actions** tab and placed in `docs/screenshots/`. Actual runs to capture:
->
-> - CI success: [44880858023](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880858023)
-> - CD staging deploy: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914)
-> - Production approval gate: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914)
-> - Blue-green switch: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914)
->
-> No image files are committed yet because capturing the browser screenshots is a manual step. This is called out explicitly rather than fabricated.
+> Screenshot 4 is from the temporary `CD Failure Demo` workflow ([44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627)), which simulated a staging SSH connection failure without touching production. Screenshot 9 is from the staging automatic-rollback demo; its terminal output is preserved in [docs/evidence/automatic-rollback-staging.md](docs/evidence/automatic-rollback-staging.md).
 
 ---
 
@@ -479,16 +479,15 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 | E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `https://shopnest.oxytumzone.com` via SSH from GitHub Actions |
 | F | Zero-downtime deployment | ✅ Complete — blue-green verified on EC2 (staging 34s, production 26s) |
 | G | Monitoring, health checks, rollback | ✅ Complete — health checks, automatic rollback and manual rollback verified |
-| H | Debugging & Copilot-assisted development | ⚠️ Partial — real failures documented, Copilot prompts documented; Actions screenshots and 3 deliberate failure runs still to capture |
-| I | Documentation & repository quality | ✅ Mostly complete — README, docs, structure, commits, PR template; screenshots pending |
+| H | Debugging & Copilot-assisted development | ⚠️ Partial — real failures documented; deliberate YAML/test/deployment failures documented with runs; 11 screenshots committed; Copilot prompts documented; literal GitHub Copilot IDE evidence not included |
+| I | Documentation & repository quality | ✅ Complete — README, docs, 11 screenshots, structure, commits, PR template; PR #1 merged and PR #2/#3 open as evidence |
 
 ### Remaining manual tasks
 
-1. **Screenshots**: capture the Actions runs into `docs/screenshots/` (see `docs/screenshots/README.md`).
-2. **Part H deliberate failures**: create and capture 3 different pipeline failures (YAML, test, deployment) on branches.
-3. **PR history**: PR #1 is merged; future changes should be opened as pull requests (see [docs/BRANCHING.md](docs/BRANCHING.md)).
-4. **Old repo cleanup**: delete `DevOps-Module-5-Assignment-old` (the previous repo, renamed because the token lacked `delete_repo`).
-5. **Keep the server running**: keep EC2 instance `i-0caf589083c6b43cb` running until grading finishes.
+1. **Old repo cleanup**: delete `DevOps-Module-5-Assignment-old` (the previous repo, renamed because the token lacked `delete_repo`).
+2. **Keep the server running**: keep EC2 instance `i-0caf589083c6b43cb` running until grading finishes.
+3. **Literal GitHub Copilot evidence**: if the grader requires a GitHub Copilot IDE session, capture the prompts and generated workflow diff (see [docs/COPILOT.md](docs/COPILOT.md)).
+4. **Evidence PRs**: PR #2 (YAML failure) and PR #3 (frontend test failure + screenshots) are open and intentionally failing; do not merge them.
 
 ---
 
