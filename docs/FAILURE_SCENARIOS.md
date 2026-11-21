@@ -169,13 +169,13 @@ fatal: Not possible to fast-forward, aborting.
    git fetch origin
    git reset --hard origin/main
    ```
-15. Changed `cd.yml` to check out the **exact commit** associated with the image tag instead of pulling the branch:
+- Changed `cd.yml` to check out the **exact commit** associated with the image tag instead of pulling the branch:
    ```bash
    git checkout -- nginx/gateway/default.conf 2>/dev/null || true
    git fetch origin
    git checkout --detach "$FULL_SHA"
    ```
-15. **Verification:** runs [44879363921](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44879363921) (staging) and [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) (staging + production) passed.
+- **Verification:** runs [44879363921](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44879363921) (staging) and [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) (staging + production) passed.
 
 ---
 
@@ -225,10 +225,56 @@ Error: missing server host
 
 **Temporary workflow:** `cd-failure-demo.yml` on branch `evidence/deployment-failure-demo` (deleted after the run)
 **Run:** [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627)
-**Error:** `ssh.ParsePrivateKey: ssh: no key found`, `dial tcp: lookup staging.invalid.example.com ... no such host`
-**Root cause:** invalid host/key in the temporary demo workflow.
-**Impact:** none — no production/staging services were touched.
-**Evidence:** `docs/screenshots/04-ci-failed-deployment-run.png`
+**Failed step:** `Simulate staging SSH failure` → `Attempt SSH to an invalid staging host`
+
+#### Observed errors
+
+```text
+ssh.ParsePrivateKey: ssh: no key found
+dial tcp: lookup staging.invalid.example.com on 127.0.0.53:53: no such host
+##[error]Process completed with exit code 1.
+```
+
+#### Root cause
+
+Two separate issues:
+
+1. **No usable SSH private-key data was provided.** The demo workflow passed an intentionally invalid placeholder key, so `appleboy/ssh-action` could not parse a private key (`ssh.ParsePrivateKey: ssh: no key found`).
+2. **The configured staging hostname was an intentionally invalid placeholder.** `staging.invalid.example.com` does not resolve, so the SSH client could not connect (`no such host`).
+
+These are independent: even with a valid key, the invalid hostname would fail; even with a valid hostname, the invalid key would fail.
+
+#### Copilot troubleshooting
+
+Copilot's explanation and remediation recommendations:
+
+- Use **GitHub Actions Secrets** and protected **Environments** for sensitive values, with separate credentials for staging and production.
+- Verify the correct staging hostname and SSH port.
+- Use a verified `known_hosts` file and enable **strict host-key checking**.
+- Use a least-privilege deployment account and key.
+- Validate network reachability and SSH connectivity with a non-mutating check before deploying.
+
+> Copilot provided a remediation plan only. The plan was **not** implemented in this repository; this was a temporary failure-demo workflow.
+
+**Supplementary remediation notes (not Copilot's actual response):**
+
+- `appleboy/ssh-action` with `host`, `username`, and `key: ${{ secrets.EC2_SSH_KEY }}` (or an environment-scoped secret).
+- Restrict SSH ingress to GitHub Actions IP ranges, or use a self-hosted runner.
+- A non-mutating pre-check such as `nc -zv <host> 22` or `ssh -o ConnectTimeout=5 <user>@<host> true`.
+
+#### Evidence
+
+- Actions run: [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627)
+- Screenshot: `docs/screenshots/04-ci-failed-deployment-run.png`
+- Copilot screenshot: `docs/screenshots/05-copilot-deployment-failure-troubleshooting.png`
+
+#### Important limitation
+
+- This was a **temporary failure-demo workflow** (`cd-failure-demo.yml`) on branch `evidence/deployment-failure-demo`.
+- The temporary workflow was removed after the run; it is not part of the repository.
+- No production or staging service was affected.
+- No actual deployment fix commit or successful rerun exists for this temporary demo.
+- Copilot provided a remediation plan; **do not claim that the plan was implemented**.
 
 ---
 

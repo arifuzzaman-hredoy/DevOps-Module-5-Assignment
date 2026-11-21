@@ -190,7 +190,7 @@ This is a repository setting and cannot be committed as code; it is documented h
 
 ## 7. Part D — Secrets and Configuration Management
 
-- No real password, key, or token exists in the repository (only obvious placeholders in `.env.example` and `appsettings.json`). The commit history contains the EC2 public IP in earlier README versions; see [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) for the audit and remediation steps.
+- No real password, key, or token exists in the repository (only obvious placeholders in `.env.example` and `appsettings.json`). The Git history was rewritten to remove the EC2 public IP from all reachable history; see [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) for the audit and remediation record.
 - `.env` is git-ignored; only `.env.example` (with placeholders) is committed.
 - Staging and production use **separate GitHub Environments**, each with its own secrets and variables.
 - Production deployment requires a **manual reviewer** in the `production` environment.
@@ -463,6 +463,9 @@ All 11 required screenshots plus 3 additional evidence images (**14 total**) are
 | 9 | [09-automatic-rollback.png](docs/screenshots/09-automatic-rollback.png) | Staging automatic-rollback demo; exact output in [docs/evidence/automatic-rollback-staging.md](docs/evidence/automatic-rollback-staging.md) |
 | 10 | [10-manual-rollback.png](docs/screenshots/10-manual-rollback.png) | Manual rollback run [44892753441](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44892753441) |
 | 11 | [11-workflow-run-history.png](docs/screenshots/11-workflow-run-history.png) | [Actions tab](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions) showing successful and failed runs |
+| 12 | [copilot-ci-workflow-generation.png](docs/screenshots/copilot-ci-workflow-generation.png) | GitHub Copilot Chat prompt/response used for workflow generation/refinement |
+| 13 | [live-storefront.png](docs/screenshots/live-storefront.png) | Live ShopNest storefront (https://shopnest.oxytumzone.com) |
+| 14 | [live-product-detail.png](docs/screenshots/live-product-detail.png) | Live ShopNest product detail page |
 
 > Screenshot 4 is from the temporary `CD Failure Demo` workflow ([44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627)), which simulated a staging SSH connection failure without touching production. Screenshot 9 is from the staging automatic-rollback demo; its terminal output is preserved in [docs/evidence/automatic-rollback-staging.md](docs/evidence/automatic-rollback-staging.md).
 
@@ -475,18 +478,19 @@ All 11 required screenshots plus 3 additional evidence images (**14 total**) are
 | A | CI/CD concepts | ✅ Complete |
 | B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44880858023` |
 | C | Workflow architecture | ✅ Verified: Node 20/22 matrix, backend job, `docker` dependency, artifacts, GHCR |
-| D | Secrets & configuration | ✅ No real secrets committed; raw IP found in history (see [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md)); staging/production environments, production reviewer and branch protection configured |
+| D | Secrets & configuration | ✅ No real secrets committed; history rewritten and raw IP removed (see [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md)); staging/production environments, production reviewer and branch protection configured |
 | E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `https://shopnest.oxytumzone.com` via SSH from GitHub Actions |
 | F | Zero-downtime deployment | ✅ Complete — blue-green verified on EC2 (staging 34s, production 26s) |
 | G | Monitoring, health checks, rollback | ✅ Complete — health checks, automatic rollback and manual rollback verified |
-| H | Debugging & Copilot-assisted development | ✅ Complete — real failures documented; deliberate YAML/test/deployment failures documented with runs and fixes; 14 screenshots committed, including GitHub Copilot Chat interaction evidence; Kilo workflow-generation attribution and AI-assisted changes documented |
+| H | Debugging & Copilot-assisted development | ⚠️ Partial — real failures documented; deliberate YAML/test/deployment failures documented with runs and fixes; 14 screenshots committed; Copilot Chat workflow-generation evidence included; literal Copilot troubleshooting evidence for each failure not included |
 | I | Documentation & repository quality | ✅ Complete — README, docs, 14 screenshots, structure, commits, PR template; PR #1 merged and PR #2/#3 open as evidence |
 
-### Remaining manual tasks
+### Submission notes
 
 1. **Old repo cleanup**: delete `DevOps-Module-5-Assignment-old` (the previous repo, renamed because the token lacked `delete_repo`).
 2. **Keep the server running**: keep EC2 instance `i-0caf589083c6b43cb` running until grading finishes.
-3. **Evidence PRs**: PR #2 (YAML failure) and PR #3 (frontend test failure + screenshots) are open and intentionally failing; do not merge them.
+3. **Evidence PRs**: PR #2 (YAML failure), #3 (frontend test failure), and #5 (task 03 test failure) are open and intentionally failing; do not merge them.
+15. **Optional Copilot evidence**: if the grader requires literal Copilot troubleshooting screenshots for each failure, capture them using the prompts in [docs/COPILOT.md](docs/COPILOT.md).
 
 ---
 
