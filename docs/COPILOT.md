@@ -2,7 +2,9 @@
 
 ShopNest was built with AI assistance. This file records the **prompts used to generate the workflow files**, what the generated output looked like, and **what had to be changed and why** — as required by the assignment.
 
-> The workflows were generated with an AI coding assistant (Kilo). The prompts below are written so they can be pasted into **GitHub Copilot Chat** to reproduce the same result. The generated code was then reviewed, corrected, and validated with `actionlint` and real Docker runs.
+> The workflows were generated with an AI coding assistant (**Kilo**). The prompts below are written so they can be pasted into **GitHub Copilot Chat** to reproduce the same result. They are **reproducible prompts**, not proof that GitHub Copilot was used. The generated code was then reviewed, corrected, and validated with `actionlint` and real Docker runs.
+
+> **Important:** Literal GitHub Copilot IDE evidence is not included. The original workflows were generated with Kilo; the Copilot prompts are provided only for reproducibility. This is why Part H remains **Partial**.
 
 ## Prompt 1 — CI skeleton
 

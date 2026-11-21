@@ -209,11 +209,11 @@ Error: missing server host
 ### Failure 8: Deliberately injected frontend test failure
 
 **Branch:** `evidence/test-failure`
-**Commit:** `c4d77e6`
-**Runs:** [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111), [44887005810](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887005810)
+**Failing commit:** `c4d77e6`
+**Failing runs:** [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111), [44887005810](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887005810)
 **Error:** `AssertionError: expected '/api/products' to be '/api/products-wrong'`
-**Root cause:** the assertion was intentionally changed.
-**Fix:** the evidence branch intentionally keeps the failure; the fix is to revert `frontend/src/api/client.test.ts` line 41.
+**Root cause:** the assertion in `frontend/src/api/client.test.ts` line 41 was intentionally changed.
+**Fixing commit / successful run:** **Not available.** The evidence branch intentionally keeps the failure; no fix commit or green run exists for this branch. The fix evidence is therefore missing and this requirement remains incomplete.
 **Evidence:** `docs/screenshots/03-ci-failed-frontend-test.png`
 
 ---
