@@ -15,7 +15,7 @@ scenario_bad_image() {
   local before after
   before="$(active_color)"
   if IMAGE_TAG="this-tag-does-not-exist" PULL_IMAGES=true \
-      "$SCRIPT_DIR/bg-deploy.sh" "this-tag-does-not-exist" 2>&1 | sed 's/^/    /'; then
+      bash "$SCRIPT_DIR/bg-deploy.sh" "this-tag-does-not-exist" 2>&1 | sed 's/^/    /'; then
     die "Expected a bad-image deployment to fail"
   fi
   after="$(active_color)"
@@ -27,7 +27,7 @@ scenario_post_switch_failure() {
   log "Scenario: forced post-switch health failure -> automatic rollback"
   local before after
   before="$(active_color)"
-  if SIMULATE_FAILURE=post "$SCRIPT_DIR/bg-deploy.sh" "${IMAGE_TAG:-latest}" 2>&1 | sed 's/^/    /'; then
+  if SIMULATE_FAILURE=post bash "$SCRIPT_DIR/bg-deploy.sh" "${IMAGE_TAG:-latest}" 2>&1 | sed 's/^/    /'; then
     die "Expected a simulated post-switch failure"
   fi
   after="$(active_color)"
@@ -51,7 +51,7 @@ scenario_inactive_down() {
 
 scenario_manual_rollback() {
   log "Scenario: manual rollback to the standby colour"
-  "$SCRIPT_DIR/rollback.sh"
+  bash "$SCRIPT_DIR/rollback.sh"
 }
 
 case "$SCENARIO" in

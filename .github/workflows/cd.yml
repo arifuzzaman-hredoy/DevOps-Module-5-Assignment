@@ -99,13 +99,14 @@ jobs:
           script: |
             set -euo pipefail
             cd "$APP_DIR"
+            git pull --ff-only origin main
             echo "Deploying commit $COMMIT_SHA ($IMAGE_TAG) to STAGING"
             echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             export APP_COMMIT="$COMMIT_SHA"
             export APP_VERSION="$IMAGE_TAG"
-            ./scripts/bg-deploy.sh "$IMAGE_TAG"
-            ./scripts/smoke-test.sh "$TARGET_URL"
+            bash ./scripts/bg-deploy.sh "$IMAGE_TAG"
+            bash ./scripts/smoke-test.sh "$TARGET_URL"
 
   deploy-production:
     name: Deploy to production (blue-green)
@@ -139,13 +140,14 @@ jobs:
           script: |
             set -euo pipefail
             cd "$APP_DIR"
+            git pull --ff-only origin main
             echo "Blue-Green deploy of $IMAGE_TAG (commit $COMMIT_SHA) to PRODUCTION"
             echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             export APP_COMMIT="$COMMIT_SHA"
             export APP_VERSION="$IMAGE_TAG"
-            ./scripts/bg-deploy.sh "$IMAGE_TAG"
-            ./scripts/smoke-test.sh "$TARGET_URL"
+            bash ./scripts/bg-deploy.sh "$IMAGE_TAG"
+            bash ./scripts/smoke-test.sh "$TARGET_URL"
 
   manual-rollback:
     name: Manual rollback
@@ -177,11 +179,12 @@ jobs:
           script: |
             set -euo pipefail
             cd "$APP_DIR"
+            git pull --ff-only origin main
             echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             if [ "$COLOUR" = "auto" ]; then
-              ./scripts/rollback.sh "$IMAGE_TAG"
+              bash ./scripts/rollback.sh "$IMAGE_TAG"
             else
-              ./scripts/rollback.sh "$IMAGE_TAG" "$COLOUR"
+              bash ./scripts/rollback.sh "$IMAGE_TAG" "$COLOUR"
             fi
-            ./scripts/smoke-test.sh "$TARGET_URL"
+            bash ./scripts/smoke-test.sh "$TARGET_URL"
