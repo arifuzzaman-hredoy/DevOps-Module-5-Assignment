@@ -84,7 +84,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
-          REGISTRY: ${{ env.REGISTRY }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APP_DIR: ${{ vars.APP_DIR }}
@@ -101,7 +101,7 @@ jobs:
             cd "$APP_DIR"
             git pull --ff-only origin main
             echo "Deploying commit $COMMIT_SHA ($IMAGE_TAG) to STAGING"
-            echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             export APP_COMMIT="$COMMIT_SHA"
             export APP_VERSION="$IMAGE_TAG"
@@ -125,7 +125,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
-          REGISTRY: ${{ env.REGISTRY }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APP_DIR: ${{ vars.APP_DIR }}
@@ -142,7 +142,7 @@ jobs:
             cd "$APP_DIR"
             git pull --ff-only origin main
             echo "Blue-Green deploy of $IMAGE_TAG (commit $COMMIT_SHA) to PRODUCTION"
-            echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             export APP_COMMIT="$COMMIT_SHA"
             export APP_VERSION="$IMAGE_TAG"
@@ -164,7 +164,7 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           IMAGE_TAG: ${{ github.event.inputs.image_tag }}
-          REGISTRY: ${{ env.REGISTRY }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APP_DIR: ${{ vars.APP_DIR }}
@@ -180,7 +180,7 @@ jobs:
             set -euo pipefail
             cd "$APP_DIR"
             git pull --ff-only origin main
-            echo "$GHCR_TOKEN" | docker login "$REGISTRY" -u "$GHCR_USER" --password-stdin
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             if [ "$COLOUR" = "auto" ]; then
               bash ./scripts/rollback.sh "$IMAGE_TAG"
