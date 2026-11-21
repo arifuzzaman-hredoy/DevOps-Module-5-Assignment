@@ -21,6 +21,7 @@ All 11 required screenshots are committed in this directory. The assignment requ
 ## Notes
 
 - Screenshots 2, 3, and 4 are from **deliberately injected** failures created for Part H.
+15. Screenshot 3 is the deliberate frontend test failure; the fix was verified by successful run [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414).
 15. Screenshot 4 is from the temporary `CD Failure Demo` workflow, which simulated a staging SSH connection failure without touching production.
 15. Screenshot 9 is from the staging automatic-rollback demo; the exact terminal output is preserved in [automatic-rollback-staging.md](../evidence/automatic-rollback-staging.md).
 15. Do not include secrets, tokens, or internal hostnames in screenshots.

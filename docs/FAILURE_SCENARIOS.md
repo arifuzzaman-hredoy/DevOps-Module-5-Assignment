@@ -213,8 +213,11 @@ Error: missing server host
 **Failing runs:** [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111), [44887005810](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887005810)
 **Error:** `AssertionError: expected '/api/products' to be '/api/products-wrong'`
 **Root cause:** the assertion in `frontend/src/api/client.test.ts` line 41 was intentionally changed.
-**Fixing commit / successful run:** **Not available.** The evidence branch intentionally keeps the failure; no fix commit or green run exists for this branch. The fix evidence is therefore missing and this requirement remains incomplete.
-**Evidence:** `docs/screenshots/03-ci-failed-frontend-test.png`
+**Fixing commit:** `76c4d15201417fd469cb627edca46540d2425e8a`
+**Successful run:** [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414)
+**Fix:** the incorrect assertion in `frontend/src/api/client.test.ts` line 41 was restored to `expect(url).toBe('/api/products')`.
+**Verification:** frontend lint passed; all 6 frontend tests passed; `tsc -b` and `vite build` passed; GitHub Actions CI run [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414) passed (Backend .NET 10, Frontend Node 20.x, Frontend Node 22.x, Docker images).
+**Evidence:** `docs/screenshots/03-ci-failed-frontend-test.png` (failure screenshot; the fix is verified by the successful run above)
 
 ---
 
@@ -302,7 +305,7 @@ SIMULATE_FAILURE=post PULL_IMAGES=false ./scripts/bg-deploy.sh local
 | Type | Injection | Commit / run | Result |
 |---|---|---|---|
 | YAML syntax | Deliberate | `ab6b016` / [44884747114](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884747114) | Failed with invalid YAML; fixed in `4cc27b7`; [44884934412](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884934412) passed |
-| Frontend test | Deliberate | `c4d77e6` / [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111) | Failed as expected (evidence branch) |
+| Frontend test | Deliberate | `c4d77e6` / [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111) (failed); fixed in `76c4d15` / [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414) (passed) | Failed as expected, then fixed and CI passed |
 | Deployment/SSH connection | Deliberate (temporary demo) | [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627) | Failed with `no such host`; no services touched |
 | Deployment fast-forward | Naturally encountered | [44879070130](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44879070130) | Failed with `Not possible to fast-forward`; fixed by exact-commit checkout |
 
