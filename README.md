@@ -39,11 +39,6 @@ Open `http://localhost:8080` for the storefront and `http://localhost:8080/api/i
 | Staging | http://shopnest.oxytumzone.com:8080 |
 | Build metadata | https://shopnest.oxytumzone.com/api/info |
 
-| Evidence | Screenshot |
-|---|---|
-| Storefront | _Add `docs/screenshots/live-storefront.png`_ |
-| Product details | _Add `docs/screenshots/live-product-detail.png`_ |
-
 ---
 
 ## 2. Technology Stack
@@ -288,7 +283,7 @@ The database is **not** exposed: `db` has no `ports:` entry in `docker-compose.y
 
 Full step-by-step instructions, including security groups and secrets, are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-> **Not executed here:** this environment has no AWS credentials or EC2 instance. The configuration is complete and validated locally with Docker Compose; the actual cloud deployment must be run with your AWS account.
+> **Executed:** the pipeline deployed to AWS EC2. Production is live at `https://shopnest.oxytumzone.com` and staging at `http://shopnest.oxytumzone.com:8080`; the production release is a blue-green deployment with a manual approval gate. See CD run [44872809287](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44872809287) and the live `/api/info` endpoint for the deployed commit.
 
 ---
 
@@ -380,7 +375,7 @@ Or trigger the **`CD` workflow** with `action = rollback`, `environment = produc
 
 ---
 
-## 11. Part H — Debugging, Failure Testing and Copilot
+## 11. Part H — Debugging, Failure Testing and AI-Assisted Development
 
 ### Real failures found and fixed during this implementation
 
@@ -413,9 +408,11 @@ Actual result:
 [ OK ] Failure scenario 'inactive-down' completed
 ```
 
-### GitHub Copilot
+### AI assistance (Kilo) and GitHub Copilot
 
-The workflow files were generated with AI assistance and then reviewed and corrected. The exact prompts, the generated output, and the manual changes are documented in [docs/COPILOT.md](docs/COPILOT.md).
+The original workflow files were generated with **Kilo**, an AI coding assistant, and then reviewed and corrected. The exact prompts, the generated output, and the manual changes are documented in [docs/COPILOT.md](docs/COPILOT.md).
+
+The prompts in `docs/COPILOT.md` are **reproducible prompts** that can be pasted into **GitHub Copilot Chat**; they are **not** proof that GitHub Copilot was used. Literal GitHub Copilot IDE evidence is not included, which is why Part H remains **Partial**.
 
 ---
 
