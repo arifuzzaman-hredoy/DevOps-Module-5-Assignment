@@ -20,6 +20,8 @@ log "Manual rollback requested. Current='$current' Target='$target'"
 
 if [ -n "$TAG" ]; then
   export IMAGE_TAG="$TAG"
+  export APP_VERSION="$TAG"
+  export APP_COMMIT="${TAG#sha-}"
   export PULL_IMAGES="${PULL_IMAGES:-true}"
   REGISTRY="${REGISTRY:-ghcr.io/arifuzzaman-hredoy}"
   if [ -z "${BACKEND_IMAGE:-}" ]; then
