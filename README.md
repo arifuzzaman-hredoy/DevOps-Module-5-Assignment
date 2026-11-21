@@ -31,6 +31,19 @@ curl http://localhost:8080/api/products
 
 Open `http://localhost:8080` for the storefront and `http://localhost:8080/api/info` for build metadata.
 
+## Live Demo (AWS EC2)
+
+| Environment | URL |
+|---|---|
+| Production | http://[REDACTED EC2 PUBLIC IP] |
+| Staging | http://[REDACTED EC2 PUBLIC IP]:8080 |
+| Build metadata | http://[REDACTED EC2 PUBLIC IP]/api/info |
+
+| Evidence | Screenshot |
+|---|---|
+| Storefront | _Add `docs/screenshots/live-storefront.png`_ |
+| Product details | _Add `docs/screenshots/live-product-detail.png`_ |
+
 ---
 
 ## 2. Technology Stack
