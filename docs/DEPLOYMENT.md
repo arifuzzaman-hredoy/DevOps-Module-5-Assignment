@@ -108,7 +108,7 @@ push / merge to main
   └─ ci.yml
        ├─ frontend (Node 20 + 22): lint, test, build
        ├─ backend (.NET 10): format, build, test, publish
-       └─ docker: build + push ghcr.io/<owner>/shopnest-{backend,frontend}:sha-<commit>
+       └─ docker: build + push ghcr.io/<owner>/shopnest-app-{backend,frontend}:sha-<commit>
   └─ cd.yml (workflow_run)
        ├─ prepare: resolve sha-<commit>
        ├─ deploy-staging: SSH -> scripts/bg-deploy.sh -> smoke test

@@ -17,16 +17,16 @@ export PULL_IMAGES="${PULL_IMAGES:-true}"
 REGISTRY="${REGISTRY:-ghcr.io/arifuzzaman-hredoy}"
 if [ -z "${BACKEND_IMAGE:-}" ]; then
   if [ "$PULL_IMAGES" = "false" ]; then
-    export BACKEND_IMAGE="shopnest-backend:${TAG}"
+    export BACKEND_IMAGE="shopnest-app-backend:${TAG}"
   else
-    export BACKEND_IMAGE="${REGISTRY}/shopnest-backend:${TAG}"
+    export BACKEND_IMAGE="${REGISTRY}/shopnest-app-backend:${TAG}"
   fi
 fi
 if [ -z "${FRONTEND_IMAGE:-}" ]; then
   if [ "$PULL_IMAGES" = "false" ]; then
-    export FRONTEND_IMAGE="shopnest-frontend:${TAG}"
+    export FRONTEND_IMAGE="shopnest-app-frontend:${TAG}"
   else
-    export FRONTEND_IMAGE="${REGISTRY}/shopnest-frontend:${TAG}"
+    export FRONTEND_IMAGE="${REGISTRY}/shopnest-app-frontend:${TAG}"
   fi
 fi
 

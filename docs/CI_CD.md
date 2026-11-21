@@ -34,8 +34,8 @@ flowchart LR
 - Downloads `frontend-dist` and `backend-publish` — **build outputs are passed between jobs**.
 - Builds `frontend/Dockerfile.ci` and `backend/Dockerfile.ci` from those artifacts.
 - On `push` to `main`: logs in to GHCR and pushes:
-  - `ghcr.io/<owner>/shopnest-backend:sha-<short>`
-  - `ghcr.io/<owner>/shopnest-frontend:sha-<short>`
+  - `ghcr.io/<owner>/shopnest-app-backend:sha-<short>`
+  - `ghcr.io/<owner>/shopnest-app-frontend:sha-<short>`
   - plus `latest`.
 - On pull requests: builds only, no push.
 

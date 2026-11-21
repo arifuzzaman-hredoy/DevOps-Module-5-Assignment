@@ -33,8 +33,8 @@ Frontend (Node 20.x) Test  Test Files  2 passed (2)
 
 ## GHCR packages
 
-- `ghcr.io/arifuzzaman-hredoy/shopnest-backend`
-- `ghcr.io/arifuzzaman-hredoy/shopnest-frontend`
+- `ghcr.io/arifuzzaman-hredoy/shopnest-app-backend`
+- `ghcr.io/arifuzzaman-hredoy/shopnest-app-frontend`
 
 Images are tagged `sha-<commit>` and `latest` (on `main`).
 

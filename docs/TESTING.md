@@ -27,8 +27,8 @@ npm run build
 On Windows, if the checkout path contains `&`, `npm` may mis-generate script shims. Use WSL or run the commands inside a Linux container:
 
 ```bash
-docker build --target build -t shopnest-frontend-build -f frontend/Dockerfile frontend
-docker run --rm shopnest-frontend-build sh -c "npm run lint && npm test"
+docker build --target build -t shopnest-app-frontend-build -f frontend/Dockerfile frontend
+docker run --rm shopnest-app-frontend-build sh -c "npm run lint && npm test"
 ```
 
 ### Backend

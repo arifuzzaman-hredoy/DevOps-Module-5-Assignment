@@ -150,7 +150,7 @@ flowchart LR
     end
     F -->|artifact: frontend-dist| D["docker job<br/>download artifacts<br/>build + push images to GHCR"]
     B -->|artifact: backend-publish| D
-    D --> R["GHCR<br/>ghcr.io/OWNER/shopnest-{backend,frontend}:sha-<commit>"]
+    D --> R["GHCR<br/>ghcr.io/OWNER/shopnest-app-{backend,frontend}:sha-<commit>"]
 ```
 
 Key properties required by the assignment:
