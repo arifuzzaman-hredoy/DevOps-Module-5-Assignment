@@ -1,9 +1,6 @@
-name: shopnest
-
 services:
   db:
     image: postgres:17-alpine
-    container_name: shopnest-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-shopnest}
@@ -25,7 +22,6 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: shopnest-blue-backend
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
@@ -52,7 +48,6 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: shopnest-green-backend
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
@@ -79,7 +74,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: shopnest-blue-frontend
     restart: unless-stopped
     environment:
       BACKEND_HOST: blue-backend
@@ -101,7 +95,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: shopnest-green-frontend
     restart: unless-stopped
     environment:
       BACKEND_HOST: green-backend
@@ -120,7 +113,6 @@ services:
 
   gateway:
     image: nginx:1.27-alpine
-    container_name: shopnest-gateway
     restart: unless-stopped
     ports:
       - "${GATEWAY_PORT:-80}:80"
