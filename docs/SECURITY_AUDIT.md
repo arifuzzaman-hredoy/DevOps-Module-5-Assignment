@@ -28,32 +28,33 @@ git grep -n -E '3\.(106|107)\.[0-9]+\.[0-9]+'
 | `.env` files | ✅ None committed | Only `.env.example` exists, with placeholders. |
 | Database passwords | ✅ None real | `appsettings.json` has `Password=change_me` (placeholder); `.env.example` has `change-me-to-a-strong-password` (placeholder). |
 | EC2 SSH key | ✅ Not committed | The private key was never added to the repository. |
-| Raw server IP | ⚠️ Found in history | An EC2 public IPv4 address ([REDACTED EC2 PUBLIC IP]) appeared in earlier README versions. The **current working tree** no longer contains it. The **Git commit history** still contains it; history was **not** rewritten. |
+| Raw server IP | ✅ Removed | An EC2 public IPv4 address ([REDACTED EC2 PUBLIC IP]) appeared in earlier README versions. The Git history rewrite was completed; the IP was removed from all reachable history of the four branches and tag `v1.0.0`. GitHub may retain unreferenced objects or old Actions logs. |
 
 ## Status summary
 
-- **Current working tree:** no occurrence of the previously exposed raw EC2 IPv4 address. Production is referenced as `https://shopnest.oxytumzone.com`; staging is documented as `http://shopnest.oxytumzone.com:8080` (a public staging URL, distinct from the historical raw IP).
-- **Historical Git commits:** an EC2 public IPv4 address was exposed in earlier README revisions. The history has **not** been cleaned or rewritten.
+- **Current working tree:** no occurrence of the previously exposed raw EC2 IPv4 address. Production is referenced as `https://shopnest.oxytumzone.com`; staging is documented as `http://shopnest.oxytumzone.com:8080`.
+- **Git history:** the history rewrite was completed on 2026-11-21. The four branches (`main`, `evidence/github-copilot`, `evidence/test-failure`, `evidence/yaml-syntax-failure`) and tag `v1.0.0` were rewritten and force-pushed. The IP was removed from all reachable history.
 - **Credentials:** no AWS keys, private SSH keys, GitHub tokens, or real passwords were detected. No credential rotation is required.
+- **GitHub:** PRs #2, #3, and #4 remain open. Branch protection was restored (`allow_force_pushes: false`). GitHub may retain unreferenced objects or old Actions logs until garbage collection.
 
 ## Raw IP details
 
 - **Value type:** EC2 public IPv4 address (not a credential).
 - **Where:** earlier versions of `README.md` (commits `b4e8fef`, `762e92c`, `5464960`, and earlier).
-- **Current status:** no occurrence of the raw IP remains in the current working tree; production is referenced as `https://shopnest.oxytumzone.com` and staging as the documented URL `http://shopnest.oxytumzone.com:8080`.
-- **History status:** still present in the commit objects of the current history. It was **not** rewritten because the assignment rules and the repository owner's instruction forbid history rewriting / force-push without explicit permission.
+- **Current status:** removed from the current working tree and from all reachable history of the four branches and tag `v1.0.0`.
+- **History status:** the rewrite was completed on 2026-11-21. The old commit SHAs are no longer referenced by the branches/tags. GitHub may retain unreferenced objects or old Actions logs until garbage collection.
 
 ## Risk assessment
 
 - **Credentials:** no real credentials were exposed. No rotation is required.
 - **Server address:** the EC2 public IP is discoverable, but it is protected by the security group (SSH restricted; only 80/443/8080 open). The IP alone does not grant access.
-- **Impact on Part D:** the current working tree contains no occurrence of the previously exposed raw EC2 IPv4 address and no credential. Other documented URLs (e.g., the staging URL) remain. The history contains the IP; if the grader performs a strict history scan, it may flag it.
+- **Impact on Part D:** the current working tree and reachable history contain no occurrence of the previously exposed raw EC2 IPv4 address and no credential. GitHub may retain unreferenced objects or old Actions logs; a direct SHA URL may still work until garbage collection.
 
-## Remediation options
+## Remediation status
 
-1. **Preferred (requires explicit permission):** rewrite the commit history to remove the IP, then force-push. This is a destructive history operation and was **not** performed.
-2. **Alternative:** delete and recreate the repository with a clean history (the new repo would be created from the current clean tree).
-3. **No action:** accept the IP in history, since it is not a credential and the current tree is clean.
+1. **Completed:** the history rewrite was completed on 2026-11-21. The four branches and tag `v1.0.0` were rewritten and force-pushed. Branch protection was restored (`allow_force_pushes: false`).
+2. **Optional:** if a complete purge of unreferenced objects is required, contact GitHub Support to request garbage collection.
+3. **No further action:** the current tree and reachable history are clean.
 
 ## Evidence
 
@@ -61,7 +62,9 @@ git grep -n -E '3\.(106|107)\.[0-9]+\.[0-9]+'
 - AWS/private-key/token scan → **no matches**
 - `.env` scan → only `.env.example`
 - Current-tree scan for the previously exposed IP → **no matches**
-- History IP scan → matches in earlier `README.md` revisions (documented above)
+- History scan across the four branches and tag → **no matches after rewrite**
+- PRs #2, #3, #4 → **open**
+- Branch protection → `allow_force_pushes: false`
 
 ## Related files
 
