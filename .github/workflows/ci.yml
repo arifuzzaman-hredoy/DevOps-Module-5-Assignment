@@ -45,6 +45,7 @@ jobs:
 
       - name: Lint
         run: npm run lint
+      invalid_key_without_colon
 
       - name: Test
         run: npm test -- --run
