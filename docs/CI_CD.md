@@ -56,19 +56,24 @@ Resolves the exact commit to deploy:
 - `workflow_run` → `github.event.workflow_run.head_sha`
 - manual dispatch → `github.sha`
 
-Outputs `short_sha` and `image_tag = sha-<short>`.
+Outputs `commit_sha` (full SHA), `short_sha`, and `image_tag = sha-<short>`.
 
 ### `deploy-staging`
 
-Runs automatically after CI on `main`. SSHes to the staging EC2 host and runs:
+Runs automatically after CI on `main`. SSHes to the staging EC2 host and checks out the **exact commit** before deploying:
 
 ```bash
 cd "$APP_DIR"
+git checkout -- nginx/gateway/default.conf 2>/dev/null || true
+git fetch origin
+git checkout --detach "$FULL_SHA"
 docker login ghcr.io ...
 export APP_COMMIT="$COMMIT_SHA" APP_VERSION="$IMAGE_TAG" PULL_IMAGES=true
-./scripts/bg-deploy.sh "$IMAGE_TAG"
-./scripts/smoke-test.sh "$TARGET_URL"
+bash ./scripts/bg-deploy.sh "$IMAGE_TAG"
+bash ./scripts/smoke-test.sh "$TARGET_URL"
 ```
+
+> **Why exact-commit checkout?** The image tag is `sha-<commit>`. Checking out the same commit guarantees that the deployment scripts, `docker-compose.yml`, Nginx config, and application source match the image being deployed. The earlier `git pull --ff-only origin main` could deploy a newer commit than the image; it was replaced.
 
 ### `deploy-production`
 

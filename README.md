@@ -2,7 +2,7 @@
 
 A production-oriented three-tier e-commerce application built to demonstrate **automated CI/CD, containerization, zero-downtime deployment, and rollback** with GitHub Actions, Docker, and AWS EC2.
 
-> **Live URL:** **Production:** https://shopnest.oxytumzone.com  |  **Staging:** http://[REDACTED EC2 PUBLIC IP]:8080
+> **Live URL:** **Production:** https://shopnest.oxytumzone.com  |  **Staging:** http://shopnest.oxytumzone.com:8080
 >
 > Deployed on AWS EC2 (Ubuntu 24.04, Docker) through the CD pipeline in this repository. Production is a blue-green deployment with a manual approval gate; staging is deployed automatically after each successful CI run.
 
@@ -36,7 +36,7 @@ Open `http://localhost:8080` for the storefront and `http://localhost:8080/api/i
 | Environment | URL |
 |---|---|
 | Production | https://shopnest.oxytumzone.com |
-| Staging | http://[REDACTED EC2 PUBLIC IP]:8080 |
+| Staging | http://shopnest.oxytumzone.com:8080 |
 | Build metadata | https://shopnest.oxytumzone.com/api/info |
 
 | Evidence | Screenshot |
@@ -195,7 +195,7 @@ This is a repository setting and cannot be committed as code; it is documented h
 
 ## 7. Part D — Secrets and Configuration Management
 
-- No real password, key, token, or server address exists in the repository or its history (only obvious placeholders in `.env.example` and `appsettings.json`).
+- No real password, key, or token exists in the repository (only obvious placeholders in `.env.example` and `appsettings.json`). The commit history contains the EC2 public IP in earlier README versions; see [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) for the audit and remediation steps.
 - `.env` is git-ignored; only `.env.example` (with placeholders) is committed.
 - Staging and production use **separate GitHub Environments**, each with its own secrets and variables.
 - Production deployment requires a **manual reviewer** in the `production` environment.
@@ -440,10 +440,10 @@ All commands below were actually executed locally (Docker Desktop 29.9, .NET 10 
 | Auto rollback | `SIMULATE_FAILURE=post` | ✅ Rolled back, smoke passed |
 | Manual rollback | `./scripts/rollback.sh` | ✅ Switched, smoke passed |
 | Bad image safety | non-existent tag | ✅ Active colour unchanged |
-| **GitHub Actions CI** | push to `main` (run `cbee38b`) | ✅ **All jobs green** — Frontend Node 20/22, Backend (.NET 10), images published to GHCR |
+| **GitHub Actions CI** | push to `main` (run `44880858023`) | ✅ **All jobs green** — Frontend Node 20/22, Backend (.NET 10), images published to GHCR |
 
-CI run: [44871593115](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871593115) — all jobs green; images in GHCR.
-CD run: [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500) — staging (34s) and production (26s) deployed successfully with blue-green, after manual approval of the `production` environment.
+CI run: [44880858023](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880858023) — all jobs green; images in GHCR.
+CD run: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) — staging (26s) and production (26s) deployed successfully with blue-green, after manual approval of the `production` environment.
 
 Detailed logs: [docs/evidence/](docs/evidence/).
 
@@ -459,10 +459,10 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 
 > Screenshots must be captured from the **Actions** tab and placed in `docs/screenshots/`. Actual runs to capture:
 >
-> - CI success: [44871593115](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871593115)
-> - CD staging deploy: [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500)
-> - Production approval gate: [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500)
-> - Blue-green switch (green → blue): [44871707500](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44871707500)
+> - CI success: [44880858023](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880858023)
+> - CD staging deploy: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914)
+> - Production approval gate: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914)
+> - Blue-green switch: [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914)
 >
 > No image files are committed yet because capturing the browser screenshots is a manual step. This is called out explicitly rather than fabricated.
 
@@ -473,9 +473,9 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 | Part | Topic | Status |
 |---|---|---|
 | A | CI/CD concepts | ✅ Complete |
-| B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44871593115` |
+| B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44880858023` |
 | C | Workflow architecture | ✅ Verified: Node 20/22 matrix, backend job, `docker` dependency, artifacts, GHCR |
-| D | Secrets & configuration | ✅ No real secrets committed; staging/production environments, production reviewer and branch protection configured |
+| D | Secrets & configuration | ✅ No real secrets committed; raw IP found in history (see [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md)); staging/production environments, production reviewer and branch protection configured |
 | E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `https://shopnest.oxytumzone.com` via SSH from GitHub Actions |
 | F | Zero-downtime deployment | ✅ Complete — blue-green verified on EC2 (staging 34s, production 26s) |
 | G | Monitoring, health checks, rollback | ✅ Complete — health checks, automatic rollback and manual rollback verified |
@@ -486,7 +486,7 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 
 1. **Screenshots**: capture the Actions runs into `docs/screenshots/` (see `docs/screenshots/README.md`).
 2. **Part H deliberate failures**: create and capture 3 different pipeline failures (YAML, test, deployment) on branches.
-3. **PR-based workflow**: open and merge a PR so the repository shows a real pull-request history.
+3. **PR history**: PR #1 is merged; future changes should be opened as pull requests (see [docs/BRANCHING.md](docs/BRANCHING.md)).
 4. **Old repo cleanup**: delete `DevOps-Module-5-Assignment-old` (the previous repo, renamed because the token lacked `delete_repo`).
 5. **Keep the server running**: keep EC2 instance `i-0caf589083c6b43cb` running until grading finishes.
 

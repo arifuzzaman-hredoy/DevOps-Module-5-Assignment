@@ -151,6 +151,23 @@ Or use the `CD` workflow → **Run workflow** → `action=rollback`.
 | Cannot pull image | Confirm `docker login ghcr.io` succeeded and the package exists with the expected tag. |
 | SSH permission denied | Confirm the key matches `EC2_SSH_KEY` and the user is in the `docker` group. |
 
-## 10. TLS (optional, recommended for production)
+## 10. HTTPS
 
-Terminate TLS at an **Application Load Balancer** in front of EC2, or install a certificate at the Nginx gateway and expose 443. Keep port 80 as an HTTP→HTTPS redirect. The application does not handle TLS itself.
+Production is served at **https://shopnest.oxytumzone.com**.
+
+- The Nginx gateway listens on **80 and 443**.
+- Certificates are issued by **Let's Encrypt** using the **webroot** plugin (`/var/www/certbot`).
+- HTTP requests are redirected to HTTPS (`301`).
+- Renewal is handled by `certbot.timer`; a deploy hook reloads the gateway:
+
+```bash
+sudo mkdir -p /etc/letsencrypt/renewal-hooks/deploy
+sudo tee /etc/letsencrypt/renewal-hooks/deploy/reload-shopnest.sh <<'EOF'
+#!/bin/sh
+docker compose --project-directory /opt/shopnest -f /opt/shopnest/docker-compose.yml exec -T gateway nginx -s reload
+EOF
+sudo chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-shopnest.sh
+```
+
+- The EC2 security group must allow **80** and **443**; **5432** remains closed.
+- The certificate directory `/etc/letsencrypt` is mounted read-only into the gateway container.

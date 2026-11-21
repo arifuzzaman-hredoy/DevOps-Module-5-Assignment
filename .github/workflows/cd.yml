@@ -45,6 +45,7 @@ jobs:
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
       short_sha: ${{ steps.meta.outputs.short_sha }}
+      commit_sha: ${{ steps.meta.outputs.commit_sha }}
       reason: ${{ steps.meta.outputs.reason }}
     steps:
       - name: Resolve commit and image tag
@@ -63,8 +64,11 @@ jobs:
             echo "reason=manual" >> "$GITHUB_OUTPUT"
           fi
           short="${sha:0:7}"
-          echo "short_sha=$short" >> "$GITHUB_OUTPUT"
-          echo "image_tag=sha-$short" >> "$GITHUB_OUTPUT"
+          {
+            echo "short_sha=$short"
+            echo "commit_sha=$sha"
+            echo "image_tag=sha-$short"
+          } >> "$GITHUB_OUTPUT"
           echo "Resolved image tag: sha-$short (commit $sha)"
 
   deploy-staging:
@@ -90,17 +94,20 @@ jobs:
           APP_DIR: ${{ vars.APP_DIR }}
           TARGET_URL: ${{ vars.STAGING_URL }}
           COMMIT_SHA: ${{ needs.prepare.outputs.short_sha }}
+          FULL_SHA: ${{ needs.prepare.outputs.commit_sha }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ vars.EC2_PORT || 22 }}
-          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COMMIT_SHA
+          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COMMIT_SHA,FULL_SHA
           script: |
             set -euo pipefail
             cd "$APP_DIR"
-            git pull --ff-only origin main
-            echo "Deploying commit $COMMIT_SHA ($IMAGE_TAG) to STAGING"
+            git checkout -- nginx/gateway/default.conf 2>/dev/null || true
+            git fetch origin
+            git checkout --detach "$FULL_SHA"
+            echo "Deploying commit $FULL_SHA ($IMAGE_TAG) to STAGING"
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             export APP_COMMIT="$COMMIT_SHA"
@@ -131,17 +138,20 @@ jobs:
           APP_DIR: ${{ vars.APP_DIR }}
           TARGET_URL: ${{ vars.PRODUCTION_URL }}
           COMMIT_SHA: ${{ needs.prepare.outputs.short_sha }}
+          FULL_SHA: ${{ needs.prepare.outputs.commit_sha }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ vars.EC2_PORT || 22 }}
-          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COMMIT_SHA
+          envs: IMAGE_TAG,REGISTRY,GHCR_USER,GHCR_TOKEN,APP_DIR,TARGET_URL,COMMIT_SHA,FULL_SHA
           script: |
             set -euo pipefail
             cd "$APP_DIR"
-            git pull --ff-only origin main
-            echo "Blue-Green deploy of $IMAGE_TAG (commit $COMMIT_SHA) to PRODUCTION"
+            git checkout -- nginx/gateway/default.conf 2>/dev/null || true
+            git fetch origin
+            git checkout --detach "$FULL_SHA"
+            echo "Blue-Green deploy of $FULL_SHA ($IMAGE_TAG) to PRODUCTION"
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             export APP_COMMIT="$COMMIT_SHA"
@@ -179,7 +189,9 @@ jobs:
           script: |
             set -euo pipefail
             cd "$APP_DIR"
-            git pull --ff-only origin main
+            git checkout -- nginx/gateway/default.conf 2>/dev/null || true
+            git fetch origin
+            git checkout --detach origin/main
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export PULL_IMAGES=true
             if [ "$COLOUR" = "auto" ]; then
