@@ -44,7 +44,11 @@ other_color() {
 set_active_color() {
   local color="$1"
   local conf="$PROJECT_ROOT/nginx/gateway/default.conf"
-  sed -i -E "s/server (blue|green)-frontend:80/server ${color}-frontend:80/" "$conf"
+  local tmp
+  tmp="$(mktemp)"
+  sed -E "s/server (blue|green)-frontend:80/server ${color}-frontend:80/" "$conf" > "$tmp"
+  cat "$tmp" > "$conf"
+  rm -f "$tmp"
   compose exec -T gateway nginx -t
   compose exec -T gateway nginx -s reload
 }
