@@ -10,7 +10,7 @@ No screenshots are committed yet. This file defines the exact filenames, what ea
 |---|---|---|---|
 | 1 | `01-ci-successful-run.png` | CI run summary with all jobs green (Frontend Node 20/22, Backend .NET 10, Docker) | [44880858023](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880858023) |
 | 2 | `02-ci-failed-yaml-run.png` | Failed run with an "Invalid workflow file" / YAML syntax error | deliberate YAML failure (see `docs/FAILURE_SCENARIOS.md` §3.1) |
-| 3 | `03-ci-failed-test-run.png` | Failed run with a Vitest assertion failure | deliberate test failure (§3.2) |
+| 3 | `03-ci-failed-frontend-test.png` | Failed run with a Vitest assertion failure | deliberate test failure (§3.2) |
 | 4 | `04-ci-failed-deployment-run.png` | Failed CD run with SSH/connection error | deliberate deployment failure (§3.3) |
 15. | `05-cd-staging-success.png` | Successful staging deployment job | [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) |
 15. | `06-cd-production-approval.png` | "Waiting for approval" state of the `production` environment | [44880971914](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44880971914) |
