@@ -1,0 +1,2 @@
+# TLS server blocks live here on the server (nginx/tls/tls.conf, untracked).
+# The gateway includes /etc/nginx/tls/*.conf.

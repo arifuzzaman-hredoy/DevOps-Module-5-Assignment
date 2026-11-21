@@ -2,7 +2,7 @@
 
 A production-oriented three-tier e-commerce application built to demonstrate **automated CI/CD, containerization, zero-downtime deployment, and rollback** with GitHub Actions, Docker, and AWS EC2.
 
-> **Live URL:** **Production:** http://3.106.255.197  |  **Staging:** http://3.106.255.197:8080
+> **Live URL:** **Production:** https://shopnest.oxytumzone.com  |  **Staging:** http://3.106.255.197:8080
 >
 > Deployed on AWS EC2 (Ubuntu 24.04, Docker) through the CD pipeline in this repository. Production is a blue-green deployment with a manual approval gate; staging is deployed automatically after each successful CI run.
 
@@ -35,9 +35,9 @@ Open `http://localhost:8080` for the storefront and `http://localhost:8080/api/i
 
 | Environment | URL |
 |---|---|
-| Production | http://3.106.255.197 |
+| Production | https://shopnest.oxytumzone.com |
 | Staging | http://3.106.255.197:8080 |
-| Build metadata | http://3.106.255.197/api/info |
+| Build metadata | https://shopnest.oxytumzone.com/api/info |
 
 | Evidence | Screenshot |
 |---|---|
@@ -476,7 +476,7 @@ The assignment requires screenshots of successful and failed GitHub Actions runs
 | B | Continuous Integration pipeline | ✅ Implemented and verified by GitHub Actions run `44871593115` |
 | C | Workflow architecture | ✅ Verified: Node 20/22 matrix, backend job, `docker` dependency, artifacts, GHCR |
 | D | Secrets & configuration | ✅ No real secrets committed; staging/production environments, production reviewer and branch protection configured |
-| E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `http://3.106.255.197` via SSH from GitHub Actions |
+| E | Automated deployment to EC2 | ✅ Complete — deployed to AWS EC2 at `https://shopnest.oxytumzone.com` via SSH from GitHub Actions |
 | F | Zero-downtime deployment | ✅ Complete — blue-green verified on EC2 (staging 34s, production 26s) |
 | G | Monitoring, health checks, rollback | ✅ Complete — health checks, automatic rollback and manual rollback verified |
 | H | Debugging & Copilot-assisted development | ⚠️ Partial — real failures documented, Copilot prompts documented; Actions screenshots and 3 deliberate failure runs still to capture |
