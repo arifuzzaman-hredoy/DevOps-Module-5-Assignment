@@ -48,7 +48,7 @@ if [ "$PULL_IMAGES" = "true" ]; then
 fi
 
 log "Starting '$target' environment ..."
-compose up -d --no-deps "$target-backend" "$target-frontend" \
+compose up -d --no-deps --force-recreate "$target-backend" "$target-frontend" \
   || die "Failed to start '$target' containers"
 
 if ! wait_for_healthy "$target-backend" 150; then

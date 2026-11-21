@@ -42,7 +42,7 @@ if [ -n "$TAG" ]; then
   fi
 fi
 
-compose up -d --no-deps "$target-backend" "$target-frontend" \
+compose up -d --no-deps --force-recreate "$target-backend" "$target-frontend" \
   || die "Failed to start '$target'"
 
 wait_for_healthy "$target-backend" 150 || die "Rollback target backend is unhealthy."
