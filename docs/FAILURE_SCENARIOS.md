@@ -4,6 +4,8 @@ This document records (a) **real failures encountered** while building and valid
 
 > Never run the deliberate destructive scenarios against production.
 
+> **Classification:** Failures 1–6 are naturally encountered during development/operation. Failures 7–9 are deliberately injected for Part H evidence.
+
 ---
 
 ## Part 1 — Real failures found and fixed
@@ -142,7 +144,7 @@ shopnest-green-frontend Up (healthy)
 
 ---
 
-### Failure 5: CD staging failed with `Not possible to fast-forward` (current repository)
+### Failure 5: CD staging failed with `Not possible to fast-forward` (current repository, naturally encountered)
 
 **Workflow run:** [44879070130](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44879070130)
 
@@ -189,6 +191,41 @@ Error: missing server host
 **Root cause:** `EC2_HOST`, `EC2_USER`, and `EC2_SSH_KEY` were not configured.
 
 **Resolution:** the secrets/variables are now configured; the same workflow deploys successfully (run `44880971914`).
+
+---
+
+### Failure 7: Deliberately injected YAML syntax failure
+
+**Branch:** `evidence/yaml-syntax-failure`
+**Commits:** `ab6b016` (introduce), `4cc27b7` (fix)
+**Runs:** [44884747114](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884747114) (failure), [44884934412](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884934412) (success)
+**Error:** `Invalid workflow file: .github/workflows/ci.yml ... yaml syntax`
+**Root cause:** invalid YAML key/indentation.
+**Fix:** corrected the YAML.
+**Evidence:** `docs/screenshots/02-ci-failed-yaml-run.png`
+
+---
+
+### Failure 8: Deliberately injected frontend test failure
+
+**Branch:** `evidence/test-failure`
+**Commit:** `c4d77e6`
+**Runs:** [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111), [44887005810](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887005810)
+**Error:** `AssertionError: expected '/api/products' to be '/api/products-wrong'`
+**Root cause:** the assertion was intentionally changed.
+**Fix:** the evidence branch intentionally keeps the failure; the fix is to revert `frontend/src/api/client.test.ts` line 41.
+**Evidence:** `docs/screenshots/03-ci-failed-frontend-test.png`
+
+---
+
+### Failure 9: Deliberately injected deployment/SSH failure demo
+
+**Temporary workflow:** `cd-failure-demo.yml` on branch `evidence/deployment-failure-demo` (deleted after the run)
+**Run:** [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627)
+**Error:** `ssh.ParsePrivateKey: ssh: no key found`, `dial tcp: lookup staging.invalid.example.com ... no such host`
+**Root cause:** invalid host/key in the temporary demo workflow.
+**Impact:** none — no production/staging services were touched.
+**Evidence:** `docs/screenshots/04-ci-failed-deployment-run.png`
 
 ---
 
@@ -259,163 +296,32 @@ SIMULATE_FAILURE=post PULL_IMAGES=false ./scripts/bg-deploy.sh local
 
 ---
 
-## Part 3 — Three GitHub Actions pipeline failure types
 
-The assignment requires **three different kinds of pipeline failure**. Reproduce each on a **branch** (not `main`), capture the failed run, then fix it and capture the green run.
+## Part 3 — GitHub Actions pipeline failure evidence
 
-### 3.1 YAML syntax / configuration failure
+| Type | Injection | Commit / run | Result |
+|---|---|---|---|
+| YAML syntax | Deliberate | `ab6b016` / [44884747114](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884747114) | Failed with invalid YAML; fixed in `4cc27b7`; [44884934412](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44884934412) passed |
+| Frontend test | Deliberate | `c4d77e6` / [44887207111](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44887207111) | Failed as expected (evidence branch) |
+| Deployment/SSH connection | Deliberate (temporary demo) | [44889677627](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44889677627) | Failed with `no such host`; no services touched |
+| Deployment fast-forward | Naturally encountered | [44879070130](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44879070130) | Failed with `Not possible to fast-forward`; fixed by exact-commit checkout |
 
-**What to change**
-
-Create a branch and introduce an invalid YAML line in `.github/workflows/ci.yml`, for example:
-
-```yaml
-      - name: Lint
-        run: npm run lint
-      invalid_key_without_colon
-```
-
-**Expected failure**
-
-GitHub Actions reports:
-
-```text
-Invalid workflow file: .github/workflows/ci.yml
-You have an error in your yaml syntax on line ...
-```
-
-The workflow does not start; no jobs run.
-
-**Root cause**
-
-The YAML parser rejects the invalid key/indentation. `actionlint` reports the same error locally.
-
-**Copilot troubleshooting**
-
-Ask Copilot Chat:
-
-```text
-This GitHub Actions workflow fails with "Invalid workflow file ... yaml syntax". Show me the exact line and the corrected YAML.
-```
-
-**Fix**
-
-Correct the YAML, commit to the branch, and push. The CI run turns green.
-
-**Screenshot file:** `docs/screenshots/02-ci-failed-yaml-run.png`
-
-**Record:** failed run URL + fixing commit hash.
-
----
-
-### 3.2 Test failure
-
-**What to change**
-
-Create a branch and change an assertion in `frontend/src/api/client.test.ts`:
-
-```ts
-expect(fetchMock).toHaveBeenCalledWith('/api/wrong');
-```
-
-**Expected failure**
-
-The `Test` step fails in the `Frontend (Node 20.x)` and `Frontend (Node 22.x)` jobs:
-
-```text
-AssertionError: expected "fetch" to be called with arguments: [ '/api/wrong' ]
-Received: [ '/api/products' ]
-```
-
-The `docker` job is skipped because it `needs` the frontend job.
-
-**Root cause**
-
-The assertion no longer matches the client implementation.
-
-**Copilot troubleshooting**
-
-Ask Copilot Chat:
-
-```text
-This Vitest test fails with an assertion error. Compare the test expectation with the fetch URL in src/api/client.ts and explain the mismatch.
-```
-
-**Fix**
-
-Restore the correct assertion, commit, and push. The CI turns green.
-
-**Screenshot file:** `docs/screenshots/03-ci-failed-test-run.png`
-
-**Record:** failed run URL + fixing commit hash.
-
----
-
-### 3.3 Deployment / connection failure
-
-**What to change**
-
-In the GitHub `staging` environment, temporarily set `EC2_HOST` to an invalid value (for example `staging.invalid.example.com`), then run the **CD** workflow manually with `environment = staging`, `action = deploy`.
-
-**Expected failure**
-
-The `Deploy and verify staging` step fails:
-
-```text
-Error: missing server host
-```
-or
-```text
-ssh: connect to host staging.invalid.example.com port 22: Connection timed out
-```
-
-The production job is not reached.
-
-**Root cause**
-
-The SSH action cannot resolve/connect to the target host. This is a configuration/connectivity failure, not an application failure.
-
-**Copilot troubleshooting**
-
-Ask Copilot Chat:
-
-```text
-This appleboy/ssh-action step fails with "missing server host" / "Connection timed out". Check the action inputs and the environment secrets it expects.
-```
-
-**Fix**
-
-Restore the correct `EC2_HOST` secret, then re-run the CD workflow. The deployment succeeds.
-
-**Screenshot file:** `docs/screenshots/04-ci-failed-deployment-run.png`
-
-**Record:** failed run URL + fixing commit or secret update.
-
-> A real deployment failure is already recorded in this repository: run [44879070130](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44879070130) (`Not possible to fast-forward`). It can be used as additional evidence.
-
----
+> The `44879070130` failure was **not** deliberately injected. It was a real deployment failure caused by `git pull --ff-only` after the local and remote Git histories diverged. The `44889677627` failure was a deliberate temporary demo that simulated a staging SSH connection failure without touching production or staging services.
 
 ## Part 4 — Evidence capture checklist
 
 | Evidence | Filename | Run |
 |---|---|---|
 | CI successful run | `01-ci-successful-run.png` | 44880858023 |
-| CI YAML failure | `02-ci-failed-yaml-run.png` | deliberate |
-| CI test failure | `03-ci-failed-test-run.png` | deliberate |
-15. CI deployment failure | `04-ci-failed-deployment-run.png` | deliberate |
-15. CD staging success | `05-cd-staging-success.png` | 44880971914 |
-15. Production approval | `06-cd-production-approval.png` | 44880971914 |
-15. Production success | `07-cd-production-success.png` | 44880971914 |
-15. Blue-green switch | `08-blue-green-switch.png` | 44880971914 |
-15. Automatic rollback | `09-automatic-rollback.png` | deliberate / rollback run |
-15. Manual rollback | `10-manual-rollback.png` | manual rollback run |
-15. Workflow run history | `11-workflow-run-history.png` | Actions tab |
+| CI YAML failure | `02-ci-failed-yaml-run.png` | 44884747114 |
+| CI test failure | `03-ci-failed-frontend-test.png` | 44887207111 |
+| CI deployment failure | `04-ci-failed-deployment-run.png` | 44889677627 |
+| CD staging success | `05-cd-staging-success.png` | 44883093333 |
+| Production approval | `06-cd-production-approval.png` | 44890142542 |
+| Production success | `07-cd-production-success.png` | 44883093333 |
+| Blue-green switch | `08-blue-green-switch.png` | 44883093333 |
+| Automatic rollback | `09-automatic-rollback.png` | staging demo |
+| Manual rollback | `10-manual-rollback.png` | 44892753441 |
+| Workflow run history | `11-workflow-run-history.png` | Actions tab |
 
-For each deliberate failure, record:
-
-1. the failed run URL and a screenshot;
-15. the failing step log;
-15. the root-cause analysis;
-15. the fixing commit.
-
-See [screenshots/README.md](screenshots/README.md) for the naming convention and capture instructions.
+All 11 screenshots are committed in `docs/screenshots/`. See [screenshots/README.md](screenshots/README.md).
