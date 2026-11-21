@@ -1,6 +1,6 @@
 # Screenshots and Evidence
 
-All 11 required screenshots are committed in this directory, plus three additional evidence images (Copilot workflow generation, live storefront, live product detail). The assignment requires screenshots of the GitHub Actions history (successful **and** failed runs) stored in the repository and referenced from the README.
+All 11 required screenshots are committed in this directory, plus three additional evidence images (GitHub Copilot workflow interaction, live storefront, and live product detail). The assignment requires screenshots of GitHub Actions history (successful **and** failed runs) stored in the repository and referenced from the README.
 
 ## Files
 
@@ -22,16 +22,16 @@ All 11 required screenshots are committed in this directory, plus three addition
 
 | Filename | What it shows | Notes |
 |---|---|---|
-| `copilot-ci-workflow-generation.png` | GitHub Copilot Chat prompt/response used to generate/refine the CI workflow (Part H) | Provided as Part H evidence; the image content was not independently verified by the agent |
+| `copilot-ci-workflow-generation.png` | User-captured GitHub Copilot Chat prompt and workflow response | Genuine Copilot Chat interaction evidence. The original workflow implementation remains accurately attributed to Kilo; see [COPILOT.md](../COPILOT.md). |
 | `live-product-detail.png` | Live ShopNest product detail page | Captured from https://shopnest.oxytumzone.com |
 | `live-storefront.png` | Live ShopNest storefront | Captured from https://shopnest.oxytumzone.com |
 
 ## Notes
 
 - Screenshots 2, 3, and 4 are from **deliberately injected** failures created for Part H.
-15. Screenshot 3 is the deliberate frontend test failure; the fix was verified by successful run [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414).
-15. Screenshot 4 is from the temporary `CD Failure Demo` workflow, which simulated a staging SSH connection failure without touching production.
-15. Screenshot 9 is from the staging automatic-rollback demo; the exact terminal output is preserved in [automatic-rollback-staging.md](../evidence/automatic-rollback-staging.md).
-15. Do not include secrets, tokens, or internal hostnames in screenshots.
-15. Do not delete workflow runs — the assignment requires the history to remain visible.
-15. PR #2 and PR #3 are open evidence PRs; do not merge them.
+- Screenshot 3 is the deliberate frontend test failure; the fix was verified by successful run [44907810414](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44907810414).
+- Screenshot 4 is from the temporary `CD Failure Demo` workflow, which simulated a staging SSH connection failure without touching production.
+- Screenshot 9 is from the staging automatic-rollback demo; the exact terminal output is preserved in [automatic-rollback-staging.md](../evidence/automatic-rollback-staging.md).
+- Do not include secrets, tokens, or internal hostnames in screenshots.
+- Do not delete workflow runs — the assignment requires the history to remain visible.
+- PR #2 and PR #3 are open evidence PRs; do not merge them.
