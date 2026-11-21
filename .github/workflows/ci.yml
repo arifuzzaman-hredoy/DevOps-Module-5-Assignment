@@ -105,7 +105,7 @@ jobs:
           --no-build
 
       - name: Bundle migrations into publish output
-        run: Copy-Item -Recurse -Force ../database/migrations publish/migrations
+        run: cp -r ../database/migrations publish/migrations
 
       - name: Upload backend publish output
         uses: actions/upload-artifact@v4
