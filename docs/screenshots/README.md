@@ -1,6 +1,6 @@
 # Screenshots and Evidence
 
-All 11 required screenshots are committed in this directory. The assignment requires screenshots of the GitHub Actions history (successful **and** failed runs) stored in the repository and referenced from the README.
+All 11 required screenshots are committed in this directory, plus three additional evidence images (Copilot workflow generation, live storefront, live product detail). The assignment requires screenshots of the GitHub Actions history (successful **and** failed runs) stored in the repository and referenced from the README.
 
 ## Files
 
@@ -17,6 +17,14 @@ All 11 required screenshots are committed in this directory. The assignment requ
 | 9 | `09-automatic-rollback.png` | Staging automatic rollback demo | [automatic-rollback-staging.md](../evidence/automatic-rollback-staging.md) |
 | 10 | `10-manual-rollback.png` | Manual rollback workflow run | [44892753441](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions/runs/44892753441) |
 | 11 | `11-workflow-run-history.png` | Actions tab showing both successful and failed runs | [Actions tab](https://github.com/arifuzzaman-hredoy/DevOps-Module-5-Assignment/actions) |
+
+## Additional evidence
+
+| Filename | What it shows | Notes |
+|---|---|---|
+| `copilot-ci-workflow-generation.png` | GitHub Copilot Chat prompt/response used to generate/refine the CI workflow (Part H) | Provided as Part H evidence; the image content was not independently verified by the agent |
+| `live-product-detail.png` | Live ShopNest product detail page | Captured from https://shopnest.oxytumzone.com |
+| `live-storefront.png` | Live ShopNest storefront | Captured from https://shopnest.oxytumzone.com |
 
 ## Notes
 
