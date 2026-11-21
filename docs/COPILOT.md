@@ -1,10 +1,10 @@
 # Copilot-Assisted Development
 
-ShopNest was built with AI assistance. This file records the **prompts used to generate the workflow files**, what the generated output looked like, and **what had to be changed and why** — as required by the assignment.
+ShopNest was built with AI assistance. This document records the prompts used to generate the workflow files, the generated output, and the corrections made during review.
 
-> The workflows were generated with an AI coding assistant (**Kilo**). The prompts below are written so they can be pasted into **GitHub Copilot Chat** to reproduce the same result. They are **reproducible prompts**, not proof that GitHub Copilot was used. The generated code was then reviewed, corrected, and validated with `actionlint` and real Docker runs.
+> **Tool attribution:** The initial CI/CD workflows and deployment scripts were generated with **Kilo**, an AI coding assistant, and then reviewed and corrected. GitHub Copilot Chat was also used for a separate workflow-generation/refinement interaction. The genuine user-captured interaction is included as [docs/screenshots/copilot-ci-workflow-generation.png](screenshots/copilot-ci-workflow-generation.png). This evidence demonstrates Copilot Chat usage; it does not change the attribution of the original workflow implementation to Kilo.
 
-> **Important:** The original workflows were generated with Kilo, not GitHub Copilot. The prompts below are provided for reproducibility; they are not proof of GitHub Copilot usage. Part H is complete based on the AI-assisted workflow generation and the documented failure/fix evidence.
+> The prompts below are reproducible prompts. They describe the workflow-generation tasks and can be reused in GitHub Copilot Chat. Do not interpret them as proof that the original workflow files were authored by Copilot.
 
 ## Prompt 1 — CI skeleton
 
@@ -127,3 +127,10 @@ docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest
 ```
 
 The full application was then built and exercised locally; see [evidence/](evidence/).
+
+## Part H evidence summary
+
+- Initial workflow implementation: generated with Kilo, then reviewed and corrected.
+- GitHub Copilot Chat: a separate genuine interaction is captured in [copilot-ci-workflow-generation.png](screenshots/copilot-ci-workflow-generation.png).
+- Failure diagnosis, fixes, and CI run evidence: documented in [FAILURE_SCENARIOS.md](FAILURE_SCENARIOS.md) and the screenshots directory.
+- Attribution remains explicit: the Copilot screenshot proves the documented Copilot Chat interaction, not that Kilo-generated original files were authored by Copilot.
